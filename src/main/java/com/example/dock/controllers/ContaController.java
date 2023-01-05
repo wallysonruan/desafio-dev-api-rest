@@ -24,6 +24,10 @@ public class ContaController {
 
     @PostMapping
     public ContaRespostaDTO criarConta(@RequestBody ContaComandoCriarDTO contaComandoCriarDTO){
-        return mapper.contaToContaRespostaDto(service.criarConta(contaComandoCriarDTO));
+        return mapper.contaToContaRespostaDto(
+                service.criarConta(
+                        mapper.contaComandoCriarToConta(contaComandoCriarDTO)
+                )
+        );
     }
 }
