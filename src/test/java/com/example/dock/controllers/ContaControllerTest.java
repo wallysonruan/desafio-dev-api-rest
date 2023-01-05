@@ -6,9 +6,7 @@ import com.example.dock.models.Agencia;
 import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
 import com.example.dock.services.ContaService;
-import com.example.dock.services.impl.ContaServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,14 +31,16 @@ class ContaControllerTest {
     private ObjectMapper objectMapper;
     @Mock
     private ContaService service;
+    @Mock
+    private ContaMapper mapper;
 
     ContaController controller;
 
     private final String URL = "/contas";
     private final UUID UUID_DEFAULT = UUID.randomUUID();
     private final Portador PORTADOR = Portador.builder()
-            .cpf("01843536617")
-            .nome_completo("walluson ruan alexandrino ferreira")
+            .cpf("18241327005")
+            .nome_completo("Oliver Manoel Anthony Novaes")
             .build();
     private final BigDecimal SALDO = BigDecimal.valueOf(13.4);
     private final Agencia AGENCIA = Agencia.builder()
@@ -51,7 +51,7 @@ class ContaControllerTest {
     private final Boolean ATIVADA = true;
     private final Boolean BLOQUEADA = false;
 
-    private ContaComandoCriarDTO contaComandoCriarDTO = ContaComandoCriarDTO.builder()
+    private ContaComandoCriarDTO CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDTO.builder()
             .portador(PORTADOR)
             .saldo(SALDO)
             .agencia(AGENCIA)
@@ -77,14 +77,15 @@ class ContaControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new ContaController(service);
+        controller = new ContaController(service, mapper);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
     }
 
     @Test
     void criarConta_quandoReceberContaComandoCriarDTOVálido__retornarHttp200() throws Exception {
-        String contaComandoCriarAsJSON = objectMapper.writeValueAsString(contaComandoCriarDTO);
+        when(service.criarConta(any())).thenReturn(CONTA);
+        String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);
 
         mockMvc.perform(
                 post(URL)
@@ -96,8 +97,8 @@ class ContaControllerTest {
     @Test
     void criarConta_quandoReceberContaComandoCriarDTOVálido__retornarHttp200JuntoComContaCriada() throws Exception {
         when(service.criarConta(any())).thenReturn(CONTA);
-        String contaComandoCriarAsJSON = objectMapper.writeValueAsString(contaComandoCriarDTO);
-        System.out.println(contaComandoCriarAsJSON);
+        when(mapper.contaToContaRespostaDto(CONTA)).thenReturn(CONTA_RESPOSTA_DTO);
+        String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);
 
         var response = mockMvc.perform(
                 post(URL)

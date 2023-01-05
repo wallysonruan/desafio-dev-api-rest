@@ -1,10 +1,8 @@
 package com.example.dock.controllers.dtos;
 
 import com.example.dock.models.Agencia;
-import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
 import lombok.Builder;
-import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -32,15 +30,4 @@ public class ContaRespostaDTO {
     @NotNull
     @NotBlank
     public Boolean bloqueada;
-
-    public static ContaRespostaDTO contaToContaRespostaDto(Conta conta){
-        return ContaRespostaDTO.builder()
-                .uuid(conta.uuid)
-                .portador(conta.portador)
-                .saldo(conta.saldo)
-                .agencia(conta.agencia)
-                .ativada(true)
-                .bloqueada(false)
-                .build();
-    }
 }

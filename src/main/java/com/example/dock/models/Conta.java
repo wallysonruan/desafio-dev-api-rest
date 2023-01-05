@@ -40,15 +40,4 @@ public class Conta {
 
     @Column
     public Boolean bloqueada;
-
-    public static Conta contaComandoCriarToConta(ContaComandoCriarDTO contaComandoCriarDTO){
-        return Conta.builder()
-                .uuid(UUID.randomUUID())
-                .portador(contaComandoCriarDTO.portador)
-                .saldo(contaComandoCriarDTO.saldo)
-                .agencia(contaComandoCriarDTO.agencia)
-                .ativada(true)
-                .bloqueada(false)
-                .build();
-    }
 }
