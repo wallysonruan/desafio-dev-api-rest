@@ -1,4 +1,4 @@
-package com.example.dock.model;
+package com.example.dock.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

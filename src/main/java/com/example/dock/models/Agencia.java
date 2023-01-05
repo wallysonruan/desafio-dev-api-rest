@@ -1,9 +1,6 @@
-package com.example.dock.model;
+package com.example.dock.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -27,6 +24,8 @@ public class Agencia {
     @Column
     public String nome;
 
+    @Setter(AccessLevel.PRIVATE)
+    @Getter(AccessLevel.PRIVATE)
     @OneToMany(mappedBy = "agencia")
     public List<Conta> contas;
 }

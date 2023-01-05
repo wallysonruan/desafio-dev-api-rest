@@ -1,4 +1,4 @@
-package com.example.dock.model;
+package com.example.dock.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -26,7 +27,7 @@ public class Conta {
     public Portador portador;
 
     @Column
-    public Long saldo;
+    public BigDecimal saldo;
 
     @Column
     @OneToMany
