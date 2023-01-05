@@ -35,12 +35,12 @@ public class ContaRespostaDTO {
 
     public static ContaRespostaDTO contaToContaRespostaDto(Conta conta){
         return ContaRespostaDTO.builder()
-                .uuid(UUID.randomUUID())
+                .uuid(conta.uuid)
                 .portador(conta.portador)
                 .saldo(conta.saldo)
                 .agencia(conta.agencia)
                 .ativada(true)
-                .bloqueada(true)
+                .bloqueada(false)
                 .build();
     }
 }

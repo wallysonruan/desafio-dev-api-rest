@@ -9,6 +9,6 @@ import org.springframework.stereotype.Service;
 public class ContaServiceImpl implements ContaService {
     @Override
     public Conta criarConta(ContaComandoCriarDTO contaComandoCriarDTO) {
-        return null;
+        return Conta.contaComandoCriarToConta(contaComandoCriarDTO);
     }
 }

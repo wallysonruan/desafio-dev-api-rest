@@ -8,6 +8,7 @@ import com.example.dock.models.Portador;
 import com.example.dock.services.ContaService;
 import com.example.dock.services.impl.ContaServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +21,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,6 +33,8 @@ class ContaControllerTest {
     private ObjectMapper objectMapper;
     @Mock
     private ContaService service;
+
+    ContaController controller;
 
     private final String URL = "/contas";
     private final UUID UUID_DEFAULT = UUID.randomUUID();
@@ -73,7 +77,8 @@ class ContaControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(ContaController.class).build();
+        controller = new ContaController(service);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
     }
 
@@ -90,7 +95,9 @@ class ContaControllerTest {
 
     @Test
     void criarConta_quandoReceberContaComandoCriarDTOVálido__retornarHttp200JuntoComContaCriada() throws Exception {
+        when(service.criarConta(any())).thenReturn(CONTA);
         String contaComandoCriarAsJSON = objectMapper.writeValueAsString(contaComandoCriarDTO);
+        System.out.println(contaComandoCriarAsJSON);
 
         var response = mockMvc.perform(
                 post(URL)
@@ -99,7 +106,14 @@ class ContaControllerTest {
         ).andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        System.out.println(response.getContentAsString());
+        var responseToObject = objectMapper.readValue(response.getContentAsString(), Conta.class);
+
+        assertEquals(CONTA.uuid, responseToObject.uuid);
+        assertEquals(CONTA.portador, responseToObject.portador);
+        assertEquals(CONTA.saldo, responseToObject.saldo);
+        assertEquals(CONTA.agencia, responseToObject.agencia);
+        assertEquals(CONTA.ativada, responseToObject.ativada);
+        assertEquals(CONTA.bloqueada, responseToObject.bloqueada);
     }
 
     @Test

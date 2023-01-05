@@ -2,6 +2,7 @@ package com.example.dock.controllers;
 
 import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
 import com.example.dock.controllers.dtos.ContaRespostaDTO;
+import com.example.dock.services.ContaService;
 import com.example.dock.services.impl.ContaServiceImpl;
 import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,14 +17,15 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ContaController {
 
-    private ContaServiceImpl service;
+    private ContaService service;
 
-    public ContaController(ContaServiceImpl contaServiceImpl) {
-        this.service = contaServiceImpl;
+    public ContaController(ContaService contaService) {
+        this.service = contaService;
     }
 
     @PostMapping
     public ContaRespostaDTO criarConta(@RequestBody ContaComandoCriarDTO contaComandoCriarDTO){
-        return ContaRespostaDTO.contaToContaRespostaDto(service.criarConta(contaComandoCriarDTO));
+    var ser = service.criarConta(contaComandoCriarDTO);
+        return ContaRespostaDTO.contaToContaRespostaDto(ser);
     }
 }
