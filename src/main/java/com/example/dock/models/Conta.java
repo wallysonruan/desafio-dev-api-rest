@@ -30,8 +30,7 @@ public class Conta {
     @Column
     public BigDecimal saldo;
 
-    @Column
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "agencia_id")
     public Agencia agencia;
 
