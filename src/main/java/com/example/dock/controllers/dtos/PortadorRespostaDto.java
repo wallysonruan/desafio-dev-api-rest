@@ -8,17 +8,14 @@ import org.hibernate.validator.constraints.br.CPF;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PortadorRespostaDto {
-    @NotNull(message = "O campo CPF não pode ser vazio.")
-    @NotBlank(message = "O campo CPF não pode ser vazio.")
-    @CPF
+    public UUID uuid;
     public String cpf;
-    @NotNull(message = "O campo NOME COMPLETO não pode ser vazio.")
-    @NotBlank(message = "O campo NOME COMPLETO não pode ser vazio.")
     public String nome_completo;
 }
