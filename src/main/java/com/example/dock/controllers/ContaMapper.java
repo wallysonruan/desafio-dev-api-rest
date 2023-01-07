@@ -5,7 +5,7 @@ import com.example.dock.controllers.dtos.ContaRespostaDTO;
 import com.example.dock.models.Conta;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ContaMapper {
     ContaRespostaDTO contaToContaRespostaDto(Conta conta);
     Conta contaComandoCriarToConta(ContaComandoCriarDTO contaComandoCriarDTO);
