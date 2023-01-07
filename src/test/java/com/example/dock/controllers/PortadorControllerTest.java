@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.UUID;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,6 +54,7 @@ class PortadorControllerTest {
             .nome_completo(NOME_COMPLETO)
             .build();
     private final PortadorRespostaDto PORTADOR_RESPOSTA_DTO = PortadorRespostaDto.builder()
+            .uuid(UUID.randomUUID())
             .cpf(CPF)
             .nome_completo(NOME_COMPLETO)
             .build();
@@ -75,6 +78,9 @@ class PortadorControllerTest {
         PortadorRespostaDto json_as_portador_resposta_dto =  objectMapper.readValue(response.getContentAsString(), PortadorRespostaDto.class);
 
         Assertions.assertEquals(PortadorRespostaDto.class, json_as_portador_resposta_dto.getClass());
+        Assertions.assertNotNull(json_as_portador_resposta_dto.getUuid());
+        Assertions.assertNotNull(json_as_portador_resposta_dto.getCpf());
+        Assertions.assertNotNull(json_as_portador_resposta_dto.getNome_completo());
     }
 
 }
