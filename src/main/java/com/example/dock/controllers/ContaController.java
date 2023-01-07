@@ -4,6 +4,8 @@ import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
 import com.example.dock.controllers.dtos.ContaRespostaDTO;
 import com.example.dock.services.ContaService;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,11 +25,13 @@ public class ContaController {
     }
 
     @PostMapping
-    public ContaRespostaDTO criarConta(@RequestBody ContaComandoCriarDTO contaComandoCriarDTO){
-        return mapper.contaToContaRespostaDto(
+    public ResponseEntity<ContaRespostaDTO> criarConta(@RequestBody ContaComandoCriarDTO contaComandoCriarDTO){
+        var response = mapper.contaToContaRespostaDto(
                 service.criarConta(
                         mapper.contaComandoCriarToConta(contaComandoCriarDTO)
                 )
         );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
