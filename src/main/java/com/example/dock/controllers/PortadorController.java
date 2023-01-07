@@ -1,8 +1,9 @@
 package com.example.dock.controllers;
 
 import com.example.dock.controllers.dtos.PortadorComandoCriarDto;
+import com.example.dock.models.Portador;
 import com.example.dock.services.PortadorService;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,20 +15,20 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/portadores")
-@NoArgsConstructor
+@AllArgsConstructor
 public class PortadorController {
 
-    private PortadorService service;
-    private PortadorMapper mapper;
+    private final PortadorService service;
+    private final PortadorMapper mapper;
 
-    public PortadorController(PortadorService portadorService, PortadorMapper mapper) {
-        this.service = portadorService;
-        this.mapper = mapper;
-    }
 
     @PostMapping
     public ResponseEntity<?> criarPortador(@RequestBody @Valid PortadorComandoCriarDto portadorComandoCriarDto){
         var response = service.criarPortador(mapper.portadorComandoCriarDtoToPortador(portadorComandoCriarDto));
-        return new ResponseEntity<>(mapper.portadorToPortadorRespostaDto(response), HttpStatus.OK);
+
+        if(response.hasErrors()){
+            return new ResponseEntity<>(response.getErrors(), HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(mapper.portadorToPortadorRespostaDto((Portador) response.getResultado()), HttpStatus.OK);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.dock.controllers;
 
+import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.PortadorComandoCriarDto;
 import com.example.dock.controllers.dtos.PortadorRespostaDto;
 import com.example.dock.models.Portador;
@@ -29,12 +30,14 @@ class PortadorControllerTest {
     PortadorService service;
     @Mock
     PortadorMapper mapper;
+    Notification notification;
 
     @BeforeEach
     void setUp() {
         controller = new PortadorController(service, mapper);
         mvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
+        notification = new Notification();
     }
 
     private final String URL_DEFAULT = "/portadores";
@@ -54,28 +57,18 @@ class PortadorControllerTest {
             .build();
 
     @Test
-    void criarPortador_deveriaEstarDisponivelNaUrlPadrao() throws Exception{
-        String portador_comando_criar_dto_as_json = objectMapper.writeValueAsString(PORTADOR_COMANDO_CRIAR);
-        System.out.println(portador_comando_criar_dto_as_json);
-
-        mvc.perform(
-                post(URL_DEFAULT)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(portador_comando_criar_dto_as_json)
-        ).andExpect(status().isOk());
-    }
-
-    @Test
     void criarPortador_quandoReceberUmPortadorComandoCriarValido__deveriaRetornarPortadorSalvoEHttpOk() throws Exception{
-        when(service.criarPortador(PORTADOR)).thenReturn(PORTADOR);
+        notification.setResultado(PORTADOR);
+
+        when(service.criarPortador(PORTADOR)).thenReturn(notification);
         when(mapper.portadorComandoCriarDtoToPortador(PORTADOR_COMANDO_CRIAR)).thenReturn(PORTADOR);
         when(mapper.portadorToPortadorRespostaDto(PORTADOR)).thenReturn(PORTADOR_RESPOSTA_DTO);
-        String portador_as_json = objectMapper.writeValueAsString(PORTADOR_COMANDO_CRIAR);
+        String portador_comando_criar_as_json = objectMapper.writeValueAsString(PORTADOR_COMANDO_CRIAR);
 
         var response = mvc.perform(
                 post(URL_DEFAULT)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(portador_as_json)
+                        .content(portador_comando_criar_as_json)
         ).andExpect(status().isOk())
                 .andReturn().getResponse();
 

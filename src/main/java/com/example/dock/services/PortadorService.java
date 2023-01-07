@@ -1,7 +1,8 @@
 package com.example.dock.services;
 
+import com.example.dock.Notification;
 import com.example.dock.models.Portador;
 
 public interface PortadorService {
-    Portador criarPortador(Portador portador);
+    Notification criarPortador(Portador portador);
 }
