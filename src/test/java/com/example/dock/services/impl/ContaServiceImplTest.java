@@ -1,11 +1,12 @@
 package com.example.dock.services.impl;
 
+import com.example.dock.Notification;
 import com.example.dock.models.Agencia;
 import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
 import com.example.dock.repositories.ContaRepository;
 import com.example.dock.services.ContaService;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,7 @@ public class ContaServiceImplTest {
     @Mock
     ContaRepository repository;
     ContaService service;
+    Notification notification;
 
     private final UUID UUID_DEFAULT = UUID.randomUUID();
     private final Portador PORTADOR = Portador.builder()
@@ -32,12 +34,12 @@ public class ContaServiceImplTest {
     private final BigDecimal SALDO = BigDecimal.valueOf(13.4);
     private final Agencia AGENCIA = Agencia.builder()
             .uuid(UUID.randomUUID())
-            .registro(1l)
+            .registro(1L)
             .nome("Centro-BH-MG")
             .build();
     private final Boolean ATIVADA = true;
     private final Boolean BLOQUEADA = false;
-    private Conta CONTA = Conta.builder()
+    private final Conta CONTA = Conta.builder()
             .uuid(UUID_DEFAULT)
             .portador(PORTADOR)
             .agencia(AGENCIA)
@@ -48,17 +50,28 @@ public class ContaServiceImplTest {
 
     @BeforeEach
     void setUp(){
-        service = new ContaServiceImpl(repository);
+        notification = new Notification();
+        service = new ContaServiceImpl(repository, notification);
     }
 
     @Test
-    void criarConta_quandoReceberUmaContaComCpfNãoCadastrado__deveriaSalvarNoBancoDeDadosERetornarEla(){
-        when(repository.existsByPortador_Cpf(CONTA.portador.cpf)).thenReturn(true);
+    void criarConta_quandoReceberUmaContaComCpfNaoCadastrado__deveriaSalvarNoBancoDeDadosERetornarEla(){
+        notification.setResultado(CONTA);
+        when(repository.existsByPortador_Cpf(CONTA.portador.cpf)).thenReturn(false);
         when(repository.save(CONTA)).thenReturn(CONTA);
 
         var retorno = service.criarConta(CONTA);
 
-        Assert.assertEquals(retorno, CONTA);
+        Assertions.assertEquals(CONTA, retorno.getResultado());
     }
 
+    @Test
+    void criarConta_quandoReceberUmaContaComCpfJaCadastrado__deveriaRetornarNotificacaoComErro(){
+        when(repository.existsByPortador_Cpf(CONTA.portador.cpf)).thenReturn(true);
+
+        var retorno = service.criarConta(CONTA);
+
+        Assertions.assertTrue(retorno.hasErrors());
+        Assertions.assertEquals("CPF já cadastrado.", retorno.getErrors());
+    }
 }

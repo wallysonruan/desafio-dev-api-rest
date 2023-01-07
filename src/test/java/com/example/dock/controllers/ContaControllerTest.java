@@ -34,6 +34,7 @@ class ContaControllerTest {
     private ContaService service;
     @Mock
     private ContaMapper mapper;
+    Notification notification;
 
     ContaController controller;
 
@@ -81,11 +82,13 @@ class ContaControllerTest {
         controller = new ContaController(service, mapper);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
+        notification = new Notification();
     }
 
     @Test
     void criarConta_quandoReceberContaComandoCriarDtoVálido__retornarHttp200() throws Exception {
-        when(service.criarConta(any())).thenReturn(CONTA);
+        notification.setResultado(CONTA);
+        when(service.criarConta(any())).thenReturn(notification);
         String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);
 
         mockMvc.perform(
@@ -97,8 +100,8 @@ class ContaControllerTest {
 
     @Test
     void criarConta_quandoReceberContaComandoCriarDtoComCpfVálido_retornarHttp200JuntoComContaCriada() throws Exception {
-        when(service.criarConta(any())).thenReturn(CONTA);
-        when(mapper.contaToContaRespostaDto(CONTA)).thenReturn(CONTA_RESPOSTA_DTO);
+        notification.setResultado(CONTA);
+        when(service.criarConta(any())).thenReturn(notification);
         String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);
 
         var response = mockMvc.perform(

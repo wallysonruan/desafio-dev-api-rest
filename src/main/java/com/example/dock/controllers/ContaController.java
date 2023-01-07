@@ -1,5 +1,6 @@
 package com.example.dock.controllers;
 
+import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
 import com.example.dock.controllers.dtos.ContaRespostaDTO;
 import com.example.dock.services.ContaService;
@@ -25,13 +26,13 @@ public class ContaController {
     }
 
     @PostMapping
-    public ResponseEntity<ContaRespostaDTO> criarConta(@RequestBody ContaComandoCriarDTO contaComandoCriarDTO){
-        var response = mapper.contaToContaRespostaDto(
-                service.criarConta(
-                        mapper.contaComandoCriarToConta(contaComandoCriarDTO)
-                )
-        );
+    public ResponseEntity<?> criarConta(@RequestBody ContaComandoCriarDTO contaComandoCriarDTO){
+        var notification = service.criarConta(mapper.contaComandoCriarToConta(contaComandoCriarDTO));
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        if(notification.hasErrors()){
+            return new ResponseEntity<>(notification.getErrors(), HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(notification.getResultado(), HttpStatus.OK);
     }
 }
