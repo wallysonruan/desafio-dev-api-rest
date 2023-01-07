@@ -52,7 +52,8 @@ public class ContaServiceImplTest {
     }
 
     @Test
-    void criarConta_quandoReceberUmaContaVálida__deveriaPersistirNoBancoDeDadosERetornarEla(){
+    void criarConta_quandoReceberUmaContaComCpfNãoCadastrado__deveriaSalvarNoBancoDeDadosERetornarEla(){
+        when(repository.existsByPortador_Cpf(CONTA.portador.cpf)).thenReturn(true);
         when(repository.save(CONTA)).thenReturn(CONTA);
 
         var retorno = service.criarConta(CONTA);

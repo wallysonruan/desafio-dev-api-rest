@@ -1,6 +1,5 @@
 package com.example.dock.models;
 
-import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

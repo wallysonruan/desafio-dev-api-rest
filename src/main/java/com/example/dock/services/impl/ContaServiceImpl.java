@@ -16,6 +16,9 @@ public class ContaServiceImpl implements ContaService {
 
     @Override
     public Conta criarConta(Conta conta) {
+//        if(! repository.existsByPortador_Cpf(conta.portador.cpf)){
+//            return
+//        }
         return repository.save(conta);
     }
 }
