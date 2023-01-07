@@ -2,7 +2,9 @@ package com.example.dock.controllers.dtos;
 
 import com.example.dock.models.Agencia;
 import com.example.dock.models.Portador;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -10,10 +12,11 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ContaRespostaDTO {
     @NotNull
     @NotBlank
-    @NotNull
     public UUID uuid;
     @NotNull
     @NotBlank
