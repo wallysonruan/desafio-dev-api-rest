@@ -19,6 +19,7 @@ import java.util.UUID;
 public class Conta {
 
     @Id
+    @GeneratedValue(generator = "uuid")
     public UUID uuid;
 
     @NaturalId
@@ -30,7 +31,7 @@ public class Conta {
     public BigDecimal saldo;
 
     @ManyToOne
-    @JoinColumn(name = "agencia_id")
+    @JoinColumn(name = "agencia_id", referencedColumnName = "uuid")
     public Agencia agencia;
 
     @Column
