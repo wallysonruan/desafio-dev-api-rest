@@ -17,8 +17,8 @@ public class PortadorComandoCriarDto {
     @NotNull(message = "O campo CPF não pode ser vazio.")
     @NotBlank(message = "O campo CPF não pode ser vazio.")
     @CPF
-    private String cpf;
+    public String cpf;
     @NotNull(message = "O campo NOME COMPLETO não pode ser vazio.")
     @NotBlank(message = "O campo NOME COMPLETO não pode ser vazio.")
-    private String nome_completo;
+    public String nome_completo;
 }
