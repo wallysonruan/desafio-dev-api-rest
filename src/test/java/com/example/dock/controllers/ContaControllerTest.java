@@ -1,5 +1,6 @@
 package com.example.dock.controllers;
 
+import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
 import com.example.dock.controllers.dtos.ContaRespostaDTO;
 import com.example.dock.models.Agencia;
@@ -83,7 +84,7 @@ class ContaControllerTest {
     }
 
     @Test
-    void criarConta_quandoReceberContaComandoCriarDTOVálido__retornarHttp200() throws Exception {
+    void criarConta_quandoReceberContaComandoCriarDtoVálido__retornarHttp200() throws Exception {
         when(service.criarConta(any())).thenReturn(CONTA);
         String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);
 
@@ -95,7 +96,7 @@ class ContaControllerTest {
     }
 
     @Test
-    void criarConta_quandoReceberContaComandoCriarDTOVálido__retornarHttp200JuntoComContaCriada() throws Exception {
+    void criarConta_quandoReceberContaComandoCriarDtoComCpfVálido_retornarHttp200JuntoComContaCriada() throws Exception {
         when(service.criarConta(any())).thenReturn(CONTA);
         when(mapper.contaToContaRespostaDto(CONTA)).thenReturn(CONTA_RESPOSTA_DTO);
         String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);
@@ -118,7 +119,7 @@ class ContaControllerTest {
     }
 
     @Test
-    void criarConta_quandoNãoReceberContaComandoCriarDTO__retornarHttp400() throws Exception{
+    void criarConta_quandoNãoReceberContaComandoCriarDto__retornarHttp400() throws Exception{
         mockMvc.perform(
                 post(URL)
         ).andExpect(status().isBadRequest());
