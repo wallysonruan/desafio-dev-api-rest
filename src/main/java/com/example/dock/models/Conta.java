@@ -31,7 +31,7 @@ public class Conta {
     public BigDecimal saldo;
 
     @ManyToOne
-    @JoinColumn(name = "agencia_id", referencedColumnName = "uuid")
+    @JoinColumn(name = "agencia_id", referencedColumnName = "id")
     public Agencia agencia;
 
     @Column
