@@ -16,10 +16,8 @@ import java.util.List;
 public class Agencia {
 
     @Id
-    public UUID uuid;
-
-    @NaturalId
-    public Long registro;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    public Long id;
 
     @Column
     public String nome;
