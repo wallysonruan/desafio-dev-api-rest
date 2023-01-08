@@ -6,12 +6,10 @@ import com.example.dock.services.PortadorService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/portadores")
@@ -24,11 +22,22 @@ public class PortadorController {
 
     @PostMapping
     public ResponseEntity<?> criarPortador(@RequestBody @Valid PortadorComandoCriarDto portadorComandoCriarDto){
-        var response = service.criarPortador(mapper.portadorComandoCriarDtoToPortador(portadorComandoCriarDto));
+        var notification = service.criarPortador(mapper.portadorComandoCriarDtoToPortador(portadorComandoCriarDto));
 
-        if(response.hasErrors()){
-            return new ResponseEntity<>(response.getErrors(), HttpStatus.FORBIDDEN);
+        if(notification.hasErrors()){
+            return new ResponseEntity<>(notification.getErrors(), HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>(mapper.portadorToPortadorRespostaDto((Portador) response.getResultado()), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.portadorToPortadorRespostaDto((Portador) notification.getResultado()), HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/{uuid}")
+    public ResponseEntity<?> deletarPortador(@PathVariable UUID uuid){
+        var notification = service.deletarPortador(uuid);
+
+        if(notification.hasErrors()){
+            return new ResponseEntity( notification.getErrors(), HttpStatus.NOT_FOUND);
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }

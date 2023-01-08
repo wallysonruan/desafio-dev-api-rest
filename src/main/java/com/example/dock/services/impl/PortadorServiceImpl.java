@@ -6,6 +6,8 @@ import com.example.dock.repositories.PortadorRepository;
 import com.example.dock.services.PortadorService;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class PortadorServiceImpl implements PortadorService {
 
@@ -20,6 +22,16 @@ public class PortadorServiceImpl implements PortadorService {
     @Override
     public Notification criarPortador(Portador portador) {
         notification.setResultado(repository.save(portador));
+        return notification;
+    }
+
+    @Override
+    public Notification deletarPortador(UUID uuid) {
+        if(repository.existsById(uuid)){
+            repository.deleteById(uuid);
+            return notification;
+        }
+        notification.addError("Portador (a) não cadastrado (a).");
         return notification;
     }
 }

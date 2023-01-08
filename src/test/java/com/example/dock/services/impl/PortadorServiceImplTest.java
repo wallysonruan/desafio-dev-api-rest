@@ -1,7 +1,6 @@
 package com.example.dock.services.impl;
 
 import com.example.dock.Notification;
-import com.example.dock.controllers.dtos.PortadorComandoCriarDto;
 import com.example.dock.models.Portador;
 import com.example.dock.repositories.PortadorRepository;
 import com.example.dock.services.PortadorService;
@@ -12,7 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.when;
+import java.util.UUID;
+
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PortadorServiceImplTest {
@@ -24,7 +25,9 @@ public class PortadorServiceImplTest {
 
     private final String CPF = "18241327005";
     private final String NOME_COMPLETO = "Oliver Manoel Anthony Novaes";
+    private final UUID UUID_DEFAULT = UUID.fromString("873e2fcb-d3a1-454c-91cb-c2422f6958f3");
     private final Portador PORTADOR = Portador.builder()
+            .uuid(UUID.randomUUID())
             .cpf(CPF)
             .nome_completo(NOME_COMPLETO)
             .build();
@@ -36,12 +39,33 @@ public class PortadorServiceImplTest {
     }
 
     @Test
-    void criarPortador__quandoReceberUmPortadorValidoComCpfNuncaCadastrado__PersistirNoBancoDeDadosERetornar(){
+    void criarPortador__quandoReceberUmPortadorValidoComCpfNuncaCadastrado__persistirNoBancoDeDadosERetornar(){
         notification.setResultado(PORTADOR);
         when(repository.save(PORTADOR)).thenReturn(PORTADOR);
 
         var response = service.criarPortador(PORTADOR);
 
         Assertions.assertEquals(PORTADOR, response.getResultado());
+    }
+
+    @Test
+    void deletarPortador_quandoReceberUuidDePortadorRegistrado__deveriaDeletarDoBancoDeDados(){
+        when(repository.existsById(UUID_DEFAULT)).thenReturn(true);
+        doNothing().when(repository).deleteById(UUID_DEFAULT);
+
+        var response = service.deletarPortador(UUID_DEFAULT);
+
+        verify(repository, times(1)).deleteById(UUID_DEFAULT);
+        Assertions.assertFalse(notification.hasErrors());
+    }
+
+    @Test
+    void deletarPortador_quandoReceberUuidDePortadorNãoRegistrado__deveriaRetornarNotificacaoComErro(){
+        when(repository.existsById(UUID_DEFAULT)).thenReturn(false);
+
+        var response = service.deletarPortador(UUID_DEFAULT);
+
+        verify(repository, never()).deleteById(UUID_DEFAULT);
+        Assertions.assertTrue(notification.hasErrors());
     }
 }

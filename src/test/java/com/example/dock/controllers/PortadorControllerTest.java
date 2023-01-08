@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,6 +44,7 @@ class PortadorControllerTest {
     }
 
     private final String URL_DEFAULT = "/portadores";
+    private final UUID UUID_DEFAULT = UUID.randomUUID();
     private final String CPF = "18241327005";
     private final String NOME_COMPLETO = "Oliver Manoel Anthony Novaes";
     private final PortadorComandoCriarDto PORTADOR_COMANDO_CRIAR = PortadorComandoCriarDto.builder()
@@ -54,7 +56,7 @@ class PortadorControllerTest {
             .nome_completo(NOME_COMPLETO)
             .build();
     private final PortadorRespostaDto PORTADOR_RESPOSTA_DTO = PortadorRespostaDto.builder()
-            .uuid(UUID.randomUUID())
+            .uuid(UUID_DEFAULT)
             .cpf(CPF)
             .nome_completo(NOME_COMPLETO)
             .build();
@@ -83,4 +85,27 @@ class PortadorControllerTest {
         Assertions.assertNotNull(json_as_portador_resposta_dto.getNome_completo());
     }
 
+    @Test
+    void deletarPortador_quandoReceberUuidDePortadorRegistrado__ApagarERetornar204() throws Exception{
+        when(service.deletarPortador(UUID_DEFAULT)).thenReturn(notification);
+
+        mvc.perform(
+                delete(URL_DEFAULT + "/" + UUID_DEFAULT)
+        ).andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deletarPortador_quandoReceberUuidDePortadorNãoRegistrado__Retornar404() throws Exception{
+        var mensagem_de_erro = "Portador (a) não cadastrado (a).";
+        notification.addError(mensagem_de_erro);
+        when(service.deletarPortador(UUID_DEFAULT)).thenReturn(notification);
+
+        var response = mvc.perform(
+                delete(URL_DEFAULT + "/" + UUID_DEFAULT)
+        ).andExpect(status().isNotFound())
+                .andReturn().getResponse();
+
+        Assertions.assertTrue(notification.hasErrors());
+        Assertions.assertEquals(mensagem_de_erro, response.getContentAsString());
+    }
 }
