@@ -4,7 +4,6 @@ import com.example.dock.controllers.dtos.AgenciaComandoCriarDto;
 import com.example.dock.models.Agencia;
 import com.example.dock.services.AgenciaService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +18,8 @@ import javax.validation.Valid;
 @AllArgsConstructor
 public class AgenciaController {
 
-    private AgenciaService service;
-    private AgenciaMapper mapper;
+    private final AgenciaService service;
+    private final AgenciaMapper mapper;
 
     @PostMapping
     public ResponseEntity<?> criarAgencia(@RequestBody @Valid AgenciaComandoCriarDto agenciaComandoCriarDto){

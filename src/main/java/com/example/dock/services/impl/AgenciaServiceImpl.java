@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AgenciaServiceImpl implements AgenciaService {
 
-    private AgenciaRepository repository;
+    private final AgenciaRepository repository;
     private Notification notification;
 
     AgenciaServiceImpl(AgenciaRepository repository, Notification notification){
