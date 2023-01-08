@@ -26,4 +26,14 @@ public class AgenciaServiceImpl implements AgenciaService {
         notification.setResultado(repository.save(agencia));
         return notification;
     }
+
+    @Override
+    public Notification deletarAgencia(Long id) {
+        if(repository.existsById(id)){
+            repository.deleteById(id);
+            return notification;
+        }
+        notification.addError("Agência não cadastrada.");
+        return notification;
+    }
 }

@@ -6,10 +6,7 @@ import com.example.dock.services.AgenciaService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -30,5 +27,15 @@ public class AgenciaController {
         }
 
         return new ResponseEntity(mapper.agenciaToAgenciaRespostaDto((Agencia) notification.getResultado()), HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<?> deletarAgencia(@PathVariable Long id){
+        var notification = service.deletarAgencia(id);
+        if(notification.hasErrors()){
+            return new ResponseEntity<>(notification.getErrors(), HttpStatus.FORBIDDEN);
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }

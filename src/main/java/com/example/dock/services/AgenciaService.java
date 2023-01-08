@@ -5,4 +5,5 @@ import com.example.dock.models.Agencia;
 
 public interface AgenciaService {
     Notification criarAgencia(Agencia agencia);
+    Notification deletarAgencia(Long id);
 }
