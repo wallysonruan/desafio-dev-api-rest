@@ -1,10 +1,8 @@
 package com.example.dock.models;
 
 import lombok.*;
-import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
-import java.util.UUID;
 import java.util.List;
 
 @Entity
@@ -22,8 +20,8 @@ public class Agencia {
     @Column
     public String nome;
 
-    @Setter(AccessLevel.PRIVATE)
-    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     @OneToMany(mappedBy = "agencia")
     public List<Conta> contas;
 }
