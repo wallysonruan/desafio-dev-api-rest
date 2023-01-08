@@ -46,8 +46,7 @@ class ContaControllerTest {
             .build();
     private final BigDecimal SALDO = BigDecimal.valueOf(13.4);
     private final Agencia AGENCIA = Agencia.builder()
-            .uuid(UUID.randomUUID())
-            .registro(1l)
+            .id(1L)
             .nome("Centro-BH-MG")
             .build();
     private final Boolean ATIVADA = true;
