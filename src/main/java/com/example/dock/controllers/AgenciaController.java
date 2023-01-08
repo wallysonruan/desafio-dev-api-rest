@@ -3,6 +3,7 @@ package com.example.dock.controllers;
 import com.example.dock.controllers.dtos.AgenciaComandoCriarDto;
 import com.example.dock.models.Agencia;
 import com.example.dock.services.AgenciaService;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/agencias")
+@NoArgsConstructor
 public class AgenciaController {
 
     private AgenciaService service;
