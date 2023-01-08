@@ -59,4 +59,30 @@ public class AgenciaServiceImplTest {
         verify(repository, times(1)).existsByNome(AGENCIA.getNome());
         verify(repository, never()).save(AGENCIA);
     }
+
+    @Test
+    void deletarAgencia_quandoReceberIdCadastrada__deveriaPersistirAgenciaERetornarNada(){
+        when(repository.existsById(AGENCIA.getId())).thenReturn(true);
+        doNothing().when(repository).deleteById(AGENCIA.id);
+
+        var notification = service.deletarAgencia(AGENCIA.getId());
+
+        verify(repository, times(1)).existsById(AGENCIA.getId());
+        verify(repository, times(1)).deleteById(AGENCIA.getId());
+        Assertions.assertFalse(notification.hasErrors());
+        Assertions.assertNull(notification.getResultado());
+    }
+
+    @Test
+    void deletarAgencia_quandoReceberIdNaoCadastrada__deveriaRetornarNotificationComErro(){
+        when(repository.existsById(AGENCIA.getId())).thenReturn(false);
+
+        var notification = service.deletarAgencia(AGENCIA.getId());
+
+        verify(repository, times(1)).existsById(AGENCIA.getId());
+        verify(repository, never()).deleteById(AGENCIA.getId());
+        Assertions.assertTrue(notification.hasErrors());
+        Assertions.assertNull(notification.getResultado());
+        Assertions.assertEquals("Agência não cadastrada.", notification.getErrors());
+    }
 }

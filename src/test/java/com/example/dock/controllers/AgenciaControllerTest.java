@@ -4,7 +4,7 @@ import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.AgenciaComandoCriarDto;
 import com.example.dock.controllers.dtos.AgenciaRespostaDto;
 import com.example.dock.models.Agencia;
-import com.example.dock.services.impl.AgenciaServiceImpl;
+import com.example.dock.services.AgenciaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,7 +28,7 @@ public class AgenciaControllerTest {
     MockMvc mvc;
     ObjectMapper objectMapper;
     @Mock
-    AgenciaServiceImpl service;
+    AgenciaService service;
     Notification notification;
     @Mock
     AgenciaMapper mapper;
@@ -79,11 +80,38 @@ public class AgenciaControllerTest {
 
     @Test
     void criarAgencia_quandoReceberUmAgenciaComandoCriarInvalido__retornar404() throws Exception{
-
         var response = mvc.perform(
                         post(URL_DEFAULT)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("")
                 ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deletarAgencia_quandoReceberIdDeAgenciaRegistrada__deveriaRetornar204() throws Exception{
+        when(service.deletarAgencia(AGENCIA.getId())).thenReturn(notification);
+
+        var response = mvc.perform(
+                delete(URL_DEFAULT + "/" + AGENCIA.id)
+        ).andExpect(status().isNoContent())
+                .andReturn().getResponse();
+
+        verify(service, times(1)).deletarAgencia(AGENCIA.getId());
+        Assertions.assertEquals("", response.getContentAsString());
+    }
+
+    @Test
+    void deletarAgencia_quandoReceberIdDeAgenciaNaoRegistrada__deveriaRetornar404() throws Exception{
+        String MENSAGEM_DE_ERRO = "Agência não registrada.";
+        notification.addError(MENSAGEM_DE_ERRO);
+        when(service.deletarAgencia(AGENCIA.getId())).thenReturn(notification);
+
+        var response = mvc.perform(
+                        delete(URL_DEFAULT + "/" + AGENCIA.id)
+                ).andExpect(status().isForbidden())
+                .andReturn().getResponse();
+
+        verify(service, times(1)).deletarAgencia(AGENCIA.getId());
+        Assertions.assertEquals(MENSAGEM_DE_ERRO, response.getContentAsString());
     }
 }
