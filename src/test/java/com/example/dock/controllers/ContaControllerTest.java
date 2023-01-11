@@ -63,7 +63,7 @@ class ContaControllerTest {
     private ContaComandoCriarDTO CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDTO.builder()
             .portador(CONTA.getPortador().getUuid())
             .saldo(SALDO)
-            .agencia(AGENCIA)
+            .agencia(CONTA.getAgencia().getId())
             .build();
 
     private ContaRespostaDTO CONTA_RESPOSTA_DTO = ContaRespostaDTO.builder()

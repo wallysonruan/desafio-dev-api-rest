@@ -1,8 +1,10 @@
 package com.example.dock.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,5 +25,6 @@ public class Agencia {
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
     @OneToMany(mappedBy = "agencia")
-    public List<Conta> contas;
+    @JsonIgnore
+    public List<Conta> contas = new ArrayList<>();
 }

@@ -5,6 +5,7 @@ import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
 import com.example.dock.models.Agencia;
 import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
+import com.example.dock.repositories.AgenciaRepository;
 import com.example.dock.repositories.ContaRepository;
 import com.example.dock.repositories.PortadorRepository;
 import com.example.dock.services.ContaService;
@@ -28,6 +29,8 @@ public class ContaServiceImplTest {
     ContaRepository contaRrepository;
     @Mock
     PortadorRepository portadorRepository;
+    @Mock
+    AgenciaRepository agenciaRepository;
     ContaService service;
     Notification notification;
 
@@ -51,14 +54,14 @@ public class ContaServiceImplTest {
             .bloqueada(BLOQUEADA)
             .build();
     private final ContaComandoCriarDTO CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDTO.builder()
-            .agencia(CONTA.getAgencia())
+            .agencia(CONTA.getAgencia().getId())
             .portador(CONTA.getPortador().getUuid())
             .build();
 
     @BeforeEach
     void setUp(){
         notification = new Notification();
-        service = new ContaServiceImpl(contaRrepository, portadorRepository, notification);
+        service = new ContaServiceImpl(contaRrepository, portadorRepository, agenciaRepository,notification);
     }
 
     @Test

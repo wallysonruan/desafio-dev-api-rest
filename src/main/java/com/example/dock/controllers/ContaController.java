@@ -1,11 +1,9 @@
 package com.example.dock.controllers;
 
-import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
-import com.example.dock.controllers.dtos.ContaRespostaDTO;
+import com.example.dock.models.Conta;
 import com.example.dock.services.ContaService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +27,6 @@ public class ContaController {
             return new ResponseEntity<>(notification.getErrors(), HttpStatus.FORBIDDEN);
         }
 
-        return new ResponseEntity<>(notification.getResultado(), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.contaToContaRespostaDto((Conta) notification.getResultado()), HttpStatus.OK);
     }
 }

@@ -1,8 +1,5 @@
 package com.example.dock.controllers.dtos;
 
-import com.example.dock.models.Agencia;
-import com.example.dock.models.Portador;
-
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,5 +23,5 @@ public class ContaComandoCriarDTO {
     public BigDecimal saldo;
     @NotNull(message = "O campo AGENCIA não pode ser vazio.")
     @NotBlank(message = "O campo AGENCIA não pode ser vazio.")
-    public Agencia agencia;
+    public Long agencia;
 }
