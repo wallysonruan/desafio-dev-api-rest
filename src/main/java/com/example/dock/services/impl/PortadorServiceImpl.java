@@ -1,6 +1,7 @@
 package com.example.dock.services.impl;
 
 import com.example.dock.Notification;
+import com.example.dock.controllers.dtos.PortadorComandoCriarDto;
 import com.example.dock.models.Portador;
 import com.example.dock.repositories.PortadorRepository;
 import com.example.dock.services.PortadorService;
@@ -13,6 +14,7 @@ public class PortadorServiceImpl implements PortadorService {
 
     private PortadorRepository repository;
     private Notification notification;
+    private Portador portador;
 
     PortadorServiceImpl(PortadorRepository repository, Notification notification){
         this.repository = repository;
@@ -20,7 +22,17 @@ public class PortadorServiceImpl implements PortadorService {
     }
 
     @Override
-    public Notification criarPortador(Portador portador) {
+    public Notification criarPortador(PortadorComandoCriarDto portadorComandoCriarDto) {
+        notification = new Notification();
+        portador = new Portador();
+
+        if(repository.existsByCpf(portadorComandoCriarDto.cpf)){
+           notification.addError("CPF já cadastrado.");
+           return notification;
+        };
+
+        portador.setCpf(portadorComandoCriarDto.getCpf());
+        portador.setNome_completo(portadorComandoCriarDto.getNome_completo());
         notification.setResultado(repository.save(portador));
         return notification;
     }

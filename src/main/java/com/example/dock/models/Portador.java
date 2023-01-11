@@ -1,9 +1,6 @@
 package com.example.dock.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -28,4 +25,8 @@ public class Portador {
 
     @Column
     public String nome_completo;
+
+    public void setCpf(String cpf){
+        this.cpf = cpf.replaceAll("[^0-9]", "");
+    }
 }

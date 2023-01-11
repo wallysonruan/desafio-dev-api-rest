@@ -1,6 +1,7 @@
 package com.example.dock.services.impl;
 
 import com.example.dock.Notification;
+import com.example.dock.controllers.dtos.PortadorComandoCriarDto;
 import com.example.dock.models.Portador;
 import com.example.dock.repositories.PortadorRepository;
 import com.example.dock.services.PortadorService;
@@ -31,6 +32,14 @@ public class PortadorServiceImplTest {
             .cpf(CPF)
             .nome_completo(NOME_COMPLETO)
             .build();
+    private final Portador PORTADOR_SEM_UUID = Portador.builder()
+            .cpf(CPF)
+            .nome_completo(NOME_COMPLETO)
+            .build();
+    private final PortadorComandoCriarDto PORTADOR_COMANDO_CRIAR_DTO = PortadorComandoCriarDto.builder()
+            .cpf(CPF)
+            .nome_completo(NOME_COMPLETO)
+            .build();
 
     @BeforeEach
     void setUp(){
@@ -39,13 +48,24 @@ public class PortadorServiceImplTest {
     }
 
     @Test
-    void criarPortador__quandoReceberUmPortadorValidoComCpfNuncaCadastrado__persistirNoBancoDeDadosERetornar(){
+    void criarPortador__quandoReceberUmPortadorComandoCriarDtoValidoComCpfNuncaCadastrado__persistirNoBancoDeDadosERetornar(){
         notification.setResultado(PORTADOR);
-        when(repository.save(PORTADOR)).thenReturn(PORTADOR);
+        when(repository.existsByCpf(PORTADOR.getCpf())).thenReturn(false);
+        when(repository.save(PORTADOR_SEM_UUID)).thenReturn(PORTADOR);
 
-        var response = service.criarPortador(PORTADOR);
+        var response = service.criarPortador(PORTADOR_COMANDO_CRIAR_DTO);
 
         Assertions.assertEquals(PORTADOR, response.getResultado());
+    }
+
+    @Test
+    void criarPortador__quandoReceberUmPortadorComandoCriarDtoValidoComCpfJaCadastrado__persistirNoBancoDeDadosERetornar(){
+        when(repository.existsByCpf(PORTADOR.getCpf())).thenReturn(true);
+        var response = service.criarPortador(PORTADOR_COMANDO_CRIAR_DTO);
+
+        Assertions.assertTrue(response.hasErrors());
+        Assertions.assertTrue(response.getErrors().contains("CPF já cadastrado."));
+        Assertions.assertNull(response.getResultado());
     }
 
     @Test
@@ -66,6 +86,8 @@ public class PortadorServiceImplTest {
         var response = service.deletarPortador(UUID_DEFAULT);
 
         verify(repository, never()).deleteById(UUID_DEFAULT);
+        verify(repository, times(1)).existsById(UUID_DEFAULT);
+        Assertions.assertTrue(notification.getErrors().contains("Portador (a) não cadastrado (a)."));
         Assertions.assertTrue(notification.hasErrors());
     }
 }

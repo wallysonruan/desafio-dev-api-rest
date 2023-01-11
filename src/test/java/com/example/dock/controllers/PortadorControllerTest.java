@@ -65,8 +65,7 @@ class PortadorControllerTest {
     void criarPortador_quandoReceberUmPortadorComandoCriarValido__deveriaRetornarPortadorSalvoEHttpOk() throws Exception{
         notification.setResultado(PORTADOR);
 
-        when(service.criarPortador(PORTADOR)).thenReturn(notification);
-        when(mapper.portadorComandoCriarDtoToPortador(PORTADOR_COMANDO_CRIAR)).thenReturn(PORTADOR);
+        when(service.criarPortador(PORTADOR_COMANDO_CRIAR)).thenReturn(notification);
         when(mapper.portadorToPortadorRespostaDto(PORTADOR)).thenReturn(PORTADOR_RESPOSTA_DTO);
         String portador_comando_criar_as_json = objectMapper.writeValueAsString(PORTADOR_COMANDO_CRIAR);
 

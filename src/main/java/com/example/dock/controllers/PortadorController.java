@@ -22,7 +22,7 @@ public class PortadorController {
 
     @PostMapping
     public ResponseEntity<?> criarPortador(@RequestBody @Valid PortadorComandoCriarDto portadorComandoCriarDto){
-        var notification = service.criarPortador(mapper.portadorComandoCriarDtoToPortador(portadorComandoCriarDto));
+        var notification = service.criarPortador(portadorComandoCriarDto);
 
         if(notification.hasErrors()){
             return new ResponseEntity<>(notification.getErrors(), HttpStatus.FORBIDDEN);
