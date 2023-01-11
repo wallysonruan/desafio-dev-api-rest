@@ -23,7 +23,7 @@ public class ContaController {
 
     @PostMapping
     public ResponseEntity<?> criarConta(@RequestBody ContaComandoCriarDTO contaComandoCriarDTO){
-        var notification = service.criarConta(mapper.contaComandoCriarToConta(contaComandoCriarDTO));
+        var notification = service.criarConta(contaComandoCriarDTO);
 
         if(notification.hasErrors()){
             return new ResponseEntity<>(notification.getErrors(), HttpStatus.FORBIDDEN);

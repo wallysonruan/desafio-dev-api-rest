@@ -52,12 +52,6 @@ class ContaControllerTest {
     private final Boolean ATIVADA = true;
     private final Boolean BLOQUEADA = false;
 
-    private ContaComandoCriarDTO CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDTO.builder()
-            .portador(PORTADOR)
-            .saldo(SALDO)
-            .agencia(AGENCIA)
-            .build();
-
     private Conta CONTA = Conta.builder()
             .uuid(UUID_DEFAULT)
             .portador(PORTADOR)
@@ -65,6 +59,11 @@ class ContaControllerTest {
             .saldo(SALDO)
             .ativada(ATIVADA)
             .bloqueada(BLOQUEADA)
+            .build();
+    private ContaComandoCriarDTO CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDTO.builder()
+            .portador(CONTA.getPortador().getUuid())
+            .saldo(SALDO)
+            .agencia(AGENCIA)
             .build();
 
     private ContaRespostaDTO CONTA_RESPOSTA_DTO = ContaRespostaDTO.builder()
@@ -98,7 +97,7 @@ class ContaControllerTest {
     }
 
     @Test
-    void criarConta_quandoReceberContaComandoCriarDtoComCpfVálido_retornarHttp200JuntoComContaCriada() throws Exception {
+    void criarConta_quandoReceberContaComandoCriarDtoVálido_retornarHttp200JuntoComContaCriada() throws Exception {
         notification.setResultado(CONTA);
         when(service.criarConta(any())).thenReturn(notification);
         String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);

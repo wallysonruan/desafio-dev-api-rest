@@ -1,10 +1,12 @@
 package com.example.dock.services.impl;
 
 import com.example.dock.Notification;
+import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
 import com.example.dock.models.Agencia;
 import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
 import com.example.dock.repositories.ContaRepository;
+import com.example.dock.repositories.PortadorRepository;
 import com.example.dock.services.ContaService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.when;
@@ -22,7 +25,9 @@ import static org.mockito.Mockito.when;
 public class ContaServiceImplTest {
 
     @Mock
-    ContaRepository repository;
+    ContaRepository contaRrepository;
+    @Mock
+    PortadorRepository portadorRepository;
     ContaService service;
     Notification notification;
 
@@ -45,31 +50,23 @@ public class ContaServiceImplTest {
             .ativada(ATIVADA)
             .bloqueada(BLOQUEADA)
             .build();
+    private final ContaComandoCriarDTO CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDTO.builder()
+            .agencia(CONTA.getAgencia())
+            .portador(CONTA.getPortador().getUuid())
+            .build();
 
     @BeforeEach
     void setUp(){
         notification = new Notification();
-        service = new ContaServiceImpl(repository, notification);
+        service = new ContaServiceImpl(contaRrepository, portadorRepository, notification);
     }
 
     @Test
-    void criarConta_quandoReceberUmaContaComCpfNaoCadastrado__deveriaSalvarNoBancoDeDadosERetornarEla(){
+    void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorValida__deveriaBuscarPortadorAdicionarAContaSalvarNoBancoDeDadosERetornarEla(){
         notification.setResultado(CONTA);
-        when(repository.existsByPortador_Cpf(CONTA.portador.cpf)).thenReturn(false);
-        when(repository.save(CONTA)).thenReturn(CONTA);
 
-        var retorno = service.criarConta(CONTA);
+        var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
 
         Assertions.assertEquals(CONTA, retorno.getResultado());
-    }
-
-    @Test
-    void criarConta_quandoReceberUmaContaComCpfJaCadastrado__deveriaRetornarNotificacaoComErro(){
-        when(repository.existsByPortador_Cpf(CONTA.portador.cpf)).thenReturn(true);
-
-        var retorno = service.criarConta(CONTA);
-
-        Assertions.assertTrue(retorno.hasErrors());
-        Assertions.assertEquals("CPF já cadastrado.", retorno.getErrors());
     }
 }

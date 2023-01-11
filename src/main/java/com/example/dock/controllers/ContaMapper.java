@@ -8,5 +8,4 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ContaMapper {
     ContaRespostaDTO contaToContaRespostaDto(Conta conta);
-    Conta contaComandoCriarToConta(ContaComandoCriarDTO contaComandoCriarDTO);
 }

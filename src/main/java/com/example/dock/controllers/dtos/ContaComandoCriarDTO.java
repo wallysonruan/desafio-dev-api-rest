@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Builder
 @AllArgsConstructor
@@ -18,7 +19,7 @@ import java.math.BigDecimal;
 public class ContaComandoCriarDTO {
     @NotNull(message = "O campo PORTADOR não pode ser vazio.")
     @NotBlank(message = "O campo PORTADOR não pode ser vazio.")
-    public Portador portador;
+    public UUID portador;
     @NotNull(message = "O campo SALDO não pode ser vazio.")
     @NotBlank(message = "O campo SALDO não pode ser vazio.")
     @Min(value = 0, message = "O valor mínimo do saldo é R$0,00.00")
