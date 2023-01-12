@@ -21,15 +21,9 @@ public class Agencia {
     @Column
     public String nome;
 
-    @Setter(AccessLevel.PRIVATE)
-    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     @OneToMany(mappedBy = "agencia")
     @JsonIgnore
-    private List<Conta> contas = new ArrayList<>();
-
-    public static class AgenciaBuilder {//Override LOMBOK builder access to the CONTAS property.
-        private AgenciaBuilder contas(List<Conta> contas){
-            return this;
-        }
-    }
+    private final List<Conta> contas = new ArrayList<>();
 }
