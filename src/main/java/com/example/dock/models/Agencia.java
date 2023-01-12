@@ -14,7 +14,6 @@ import java.util.List;
 @Builder
 @Data
 public class Agencia {
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     public Long id;
@@ -27,4 +26,10 @@ public class Agencia {
     @OneToMany(mappedBy = "agencia")
     @JsonIgnore
     private List<Conta> contas = new ArrayList<>();
+
+    public static class AgenciaBuilder {//Override LOMBOK builder access to the CONTAS property.
+        private AgenciaBuilder contas(List<Conta> contas){
+            return this;
+        }
+    }
 }
