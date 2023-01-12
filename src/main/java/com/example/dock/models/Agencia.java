@@ -22,9 +22,9 @@ public class Agencia {
     @Column
     public String nome;
 
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.PRIVATE)
+    @Getter(AccessLevel.PRIVATE)
     @OneToMany(mappedBy = "agencia")
     @JsonIgnore
-    public List<Conta> contas = new ArrayList<>();
+    private List<Conta> contas = new ArrayList<>();
 }
