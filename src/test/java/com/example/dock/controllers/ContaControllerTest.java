@@ -8,7 +8,6 @@ import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
 import com.example.dock.services.ContaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -116,7 +115,8 @@ class ContaControllerTest {
         assertEquals(CONTA.getUuid(), responseAsObject.uuid);
         assertEquals(CONTA.getPortador(), responseAsObject.portador);
         assertEquals(CONTA.getSaldo(), responseAsObject.saldo);
-        assertEquals(CONTA.getAgencia(), responseAsObject.agencia);
+        assertEquals(CONTA.getAgencia().getId(), responseAsObject.agencia.getId());
+        assertEquals(CONTA.getAgencia().getNome(), responseAsObject.agencia.getNome());
         assertEquals(CONTA.getAtivada(), responseAsObject.ativada);
         assertEquals(CONTA.getBloqueada(), responseAsObject.bloqueada);
     }
