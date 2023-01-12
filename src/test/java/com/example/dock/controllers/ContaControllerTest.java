@@ -8,6 +8,7 @@ import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
 import com.example.dock.services.ContaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -100,23 +101,24 @@ class ContaControllerTest {
     void criarConta_quandoReceberContaComandoCriarDtoVálido_retornarHttp200JuntoComContaCriada() throws Exception {
         notification.setResultado(CONTA);
         when(service.criarConta(any())).thenReturn(notification);
-        String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);
+        when(mapper.contaToContaRespostaDto(CONTA)).thenReturn(CONTA_RESPOSTA_DTO);
 
         var response = mockMvc.perform(
                 post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(contaComandoCriarAsJSON)
+                        .content(objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO))
         ).andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        var responseToObject = objectMapper.readValue(response.getContentAsString(), Conta.class);
+        var responseAsObject = objectMapper.readValue(response.getContentAsString(), ContaRespostaDTO.class);
 
-        assertEquals(CONTA.uuid, responseToObject.uuid);
-        assertEquals(CONTA.portador, responseToObject.portador);
-        assertEquals(CONTA.saldo, responseToObject.saldo);
-        assertEquals(CONTA.agencia, responseToObject.agencia);
-        assertEquals(CONTA.ativada, responseToObject.ativada);
-        assertEquals(CONTA.bloqueada, responseToObject.bloqueada);
+        assertNotNull(responseAsObject);
+        assertEquals(CONTA.getUuid(), responseAsObject.uuid);
+        assertEquals(CONTA.getPortador(), responseAsObject.portador);
+        assertEquals(CONTA.getSaldo(), responseAsObject.saldo);
+        assertEquals(CONTA.getAgencia(), responseAsObject.agencia);
+        assertEquals(CONTA.getAtivada(), responseAsObject.ativada);
+        assertEquals(CONTA.getBloqueada(), responseAsObject.bloqueada);
     }
 
     @Test
