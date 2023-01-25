@@ -56,6 +56,8 @@ class TransacaoServiceImplTest {
 
     @Test
     void novaTransacao__quandoReceberUmTransacaoComandoCriarDtoValido__deveriaConverterParaTransacaoEPersistir(){
+        when(portadorRepository.existsById(TRANSACAO.getPortador().getUuid())).thenReturn(true);
+        when(portadorRepository.findById(TRANSACAO.getPortador().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getPortador()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
 
         var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO);
