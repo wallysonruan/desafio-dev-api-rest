@@ -6,9 +6,11 @@ import com.example.dock.models.Transacao;
 import com.example.dock.repositories.PortadorRepository;
 import com.example.dock.repositories.TransacaoRepository;
 import com.example.dock.services.TransacaoService;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Service
 public class TransacaoServiceImpl implements TransacaoService {
 
     private final TransacaoRepository transacaoRepository;
