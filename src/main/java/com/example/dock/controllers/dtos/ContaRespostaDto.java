@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContaRespostaDTO {
+public class ContaRespostaDto {
     @NotNull
     @NotBlank
     public UUID uuid;

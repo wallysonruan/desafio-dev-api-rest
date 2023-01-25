@@ -1,6 +1,6 @@
 package com.example.dock.controllers;
 
-import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
+import com.example.dock.controllers.dtos.ContaComandoCriarDto;
 import com.example.dock.models.Conta;
 import com.example.dock.services.ContaService;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ public class ContaController {
     private ContaMapper mapper;
 
     @PostMapping
-    public ResponseEntity<?> criarConta(@RequestBody ContaComandoCriarDTO contaComandoCriarDTO){
+    public ResponseEntity<?> criarConta(@RequestBody ContaComandoCriarDto contaComandoCriarDTO){
         var notification = service.criarConta(contaComandoCriarDTO);
 
         if(notification.hasErrors()){
