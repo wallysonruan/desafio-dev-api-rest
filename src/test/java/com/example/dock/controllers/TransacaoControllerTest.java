@@ -1,5 +1,6 @@
 package com.example.dock.controllers;
 
+import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.TransacaoComandoCriarDto;
 import com.example.dock.controllers.dtos.TransacaoRespostaDto;
 import com.example.dock.models.Portador;
@@ -33,6 +34,7 @@ class TransacaoControllerTest {
     TransacaoController controller;
     MockMvc mockMvc;
     ObjectMapper objectMapper;
+    Notification notification;
 
     @Mock
     TransacaoServiceImpl service;
@@ -72,11 +74,13 @@ class TransacaoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        notification = new Notification();
     }
 
     @Test
     void novaTransacao__quandoReceberTransacaoComandoCriarDtoValido__deveriaRetornarTransacaoRespostaDtoE200() throws Exception {
-        when(service.novaTransacao(any())).thenReturn(TRANSACAO);
+        notification.setResultado(TRANSACAO);
+        when(service.novaTransacao(any())).thenReturn(notification);
         String TRANSACAO_COMANDO_CRIAR_DTO_JSON = objectMapper.writeValueAsString(TRANSACAO_COMANDO_CRIAR_DTO);
 
         var response = mockMvc.perform(

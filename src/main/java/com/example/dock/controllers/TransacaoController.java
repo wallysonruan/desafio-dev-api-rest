@@ -24,7 +24,7 @@ public class TransacaoController {
     @PostMapping
     public ResponseEntity<?> novaTransacao(@RequestBody @Valid TransacaoComandoCriarDto transacaoComandoCriarDto){
         var response = service.novaTransacao(transacaoComandoCriarDto);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response.getResultado(), HttpStatus.CREATED);
     }
 
 }
