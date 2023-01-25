@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContaComandoCriarDTO {
+public class ContaComandoCriarDto {
     @NotNull(message = "O campo PORTADOR não pode ser vazio.")
     @NotBlank(message = "O campo PORTADOR não pode ser vazio.")
     public UUID portador;

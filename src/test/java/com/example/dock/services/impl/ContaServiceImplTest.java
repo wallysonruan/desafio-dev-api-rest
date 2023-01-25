@@ -1,7 +1,7 @@
 package com.example.dock.services.impl;
 
 import com.example.dock.Notification;
-import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
+import com.example.dock.controllers.dtos.ContaComandoCriarDto;
 import com.example.dock.models.Agencia;
 import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
@@ -17,10 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.UUID;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class ContaServiceImplTest {
@@ -53,7 +50,7 @@ public class ContaServiceImplTest {
             .ativada(ATIVADA)
             .bloqueada(BLOQUEADA)
             .build();
-    private final ContaComandoCriarDTO CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDTO.builder()
+    private final ContaComandoCriarDto CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDto.builder()
             .agencia(CONTA.getAgencia().getId())
             .portador(CONTA.getPortador().getUuid())
             .build();

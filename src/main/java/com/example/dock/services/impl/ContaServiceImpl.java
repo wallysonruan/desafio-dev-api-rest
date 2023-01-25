@@ -1,7 +1,7 @@
 package com.example.dock.services.impl;
 
 import com.example.dock.Notification;
-import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
+import com.example.dock.controllers.dtos.ContaComandoCriarDto;
 import com.example.dock.models.Agencia;
 import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
@@ -33,7 +33,7 @@ public class ContaServiceImpl implements ContaService {
     private Agencia agencia = new Agencia();
 
     @Override
-    public Notification criarConta(ContaComandoCriarDTO contaComandoCriarDTO) {
+    public Notification criarConta(ContaComandoCriarDto contaComandoCriarDTO) {
 
         validacoes(notification, contaComandoCriarDTO);
 
@@ -55,7 +55,7 @@ public class ContaServiceImpl implements ContaService {
         return notification;
     }
 
-    private Notification validacoes(Notification notification, ContaComandoCriarDTO contaComandoCriarDTO){
+    private Notification validacoes(Notification notification, ContaComandoCriarDto contaComandoCriarDTO){
         verificaSePortadorExiste(notification, contaComandoCriarDTO.portador);
         verificaSeAgenciaExiste(notification, contaComandoCriarDTO.agencia);
         return notification;

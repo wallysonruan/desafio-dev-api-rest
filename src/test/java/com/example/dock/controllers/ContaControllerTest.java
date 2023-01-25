@@ -1,8 +1,8 @@
 package com.example.dock.controllers;
 
 import com.example.dock.Notification;
-import com.example.dock.controllers.dtos.ContaComandoCriarDTO;
-import com.example.dock.controllers.dtos.ContaRespostaDTO;
+import com.example.dock.controllers.dtos.ContaComandoCriarDto;
+import com.example.dock.controllers.dtos.ContaRespostaDto;
 import com.example.dock.models.Agencia;
 import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
@@ -60,13 +60,13 @@ class ContaControllerTest {
             .ativada(ATIVADA)
             .bloqueada(BLOQUEADA)
             .build();
-    private ContaComandoCriarDTO CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDTO.builder()
+    private ContaComandoCriarDto CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDto.builder()
             .portador(CONTA.getPortador().getUuid())
             .saldo(SALDO)
             .agencia(CONTA.getAgencia().getId())
             .build();
 
-    private ContaRespostaDTO CONTA_RESPOSTA_DTO = ContaRespostaDTO.builder()
+    private ContaRespostaDto CONTA_RESPOSTA_DTO = com.example.dock.controllers.dtos.ContaRespostaDto.builder()
             .uuid(UUID_DEFAULT)
             .portador(PORTADOR)
             .agencia(AGENCIA)
@@ -109,7 +109,7 @@ class ContaControllerTest {
         ).andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        var responseAsObject = objectMapper.readValue(response.getContentAsString(), ContaRespostaDTO.class);
+        var responseAsObject = objectMapper.readValue(response.getContentAsString(), ContaRespostaDto.class);
 
         assertNotNull(responseAsObject);
         assertEquals(CONTA.getUuid(), responseAsObject.uuid);
