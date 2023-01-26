@@ -17,13 +17,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.UUID;
+
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ContaServiceImplTest {
 
     @Mock
-    ContaRepository contaRrepository;
+    ContaRepository contaRepository;
     @Mock
     PortadorRepository portadorRepository;
     @Mock
@@ -55,10 +58,12 @@ public class ContaServiceImplTest {
             .portador(CONTA.getPortador().getUuid())
             .build();
 
+    private final ArrayList<Conta> LISTA_DE_CONTA = new ArrayList<>();
+
     @BeforeEach
     void setUp(){
         notification = new Notification();
-        service = new ContaServiceImpl(contaRrepository, portadorRepository, agenciaRepository,notification);
+        service = new ContaServiceImpl(contaRepository, portadorRepository, agenciaRepository,notification);
     }
 
     @Test
@@ -68,5 +73,21 @@ public class ContaServiceImplTest {
         var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
 
         Assertions.assertEquals(CONTA, retorno.getResultado());
+    }
+
+    @Test
+    void getAll__deveriaRetornarTodasAsContasRegistradas(){
+        LISTA_DE_CONTA.add(CONTA);
+        LISTA_DE_CONTA.add(CONTA);
+        LISTA_DE_CONTA.add(CONTA);
+        notification.setResultado(LISTA_DE_CONTA);
+
+        when(contaRepository.findAll()).thenReturn(LISTA_DE_CONTA);
+
+        var retorno = service.getAll();
+
+        verify(contaRepository, times(1)).findAll();
+        Assertions.assertNotNull(retorno.getResultado());
+        Assertions.assertEquals(retorno.getResultado(), LISTA_DE_CONTA);
     }
 }

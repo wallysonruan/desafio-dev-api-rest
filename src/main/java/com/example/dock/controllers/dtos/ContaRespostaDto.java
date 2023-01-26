@@ -20,17 +20,17 @@ public class ContaRespostaDto {
     public UUID uuid;
     @NotNull
     @NotBlank
-    public Portador portador;
+    public Boolean ativada;
+    @NotNull
+    @NotBlank
+    public Boolean bloqueada;
     @NotNull
     @NotBlank
     public BigDecimal saldo;
     @NotNull
     @NotBlank
+    public Portador portador;
+    @NotNull
+    @NotBlank
     public Agencia agencia;
-    @NotNull
-    @NotBlank
-    public Boolean ativada;
-    @NotNull
-    @NotBlank
-    public Boolean bloqueada;
 }

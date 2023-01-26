@@ -55,6 +55,12 @@ public class ContaServiceImpl implements ContaService {
         return notification;
     }
 
+    @Override
+    public Notification getAll() {
+        notification.setResultado(contaRepository.findAll());
+        return notification;
+    }
+
     private Notification validacoes(Notification notification, ContaComandoCriarDto contaComandoCriarDTO){
         verificaSePortadorExiste(notification, contaComandoCriarDTO.portador);
         verificaSeAgenciaExiste(notification, contaComandoCriarDTO.agencia);

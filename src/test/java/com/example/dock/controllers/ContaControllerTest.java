@@ -7,6 +7,7 @@ import com.example.dock.models.Agencia;
 import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
 import com.example.dock.services.ContaService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -75,12 +78,18 @@ class ContaControllerTest {
             .bloqueada(BLOQUEADA)
             .build();
 
+    private ArrayList<Conta> LISTA_DE_CONTAS = new ArrayList<>();
+
     @BeforeEach
     void setUp() {
         controller = new ContaController(service, mapper);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
         notification = new Notification();
+
+        LISTA_DE_CONTAS.add(CONTA);
+        LISTA_DE_CONTAS.add(CONTA);
+        LISTA_DE_CONTAS.add(CONTA);
     }
 
     @Test
@@ -126,5 +135,28 @@ class ContaControllerTest {
         mockMvc.perform(
                 post(URL)
         ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getConta_quandoReceberRequisicaoGet__deveriaRetornarTodasAsContasRegistradas() throws Exception {
+        notification.setResultado(LISTA_DE_CONTAS);
+        when(service.getAll()).thenReturn(notification);
+
+        var response = mockMvc.perform(
+                get(URL)
+        ).andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        var responseAsListOfObjects = objectMapper.readValue(response.getContentAsString(), new TypeReference<ArrayList<Conta>>() {
+        });
+
+        verify(service, times(1)).getAll();
+        assertNotNull(response.getContentType());
+        assertEquals(responseAsListOfObjects.get(0).getClass(), Conta.class);
+        assertEquals(LISTA_DE_CONTAS.get(0).getUuid(), responseAsListOfObjects.get(0).getUuid());
+        assertEquals(LISTA_DE_CONTAS.get(0).getBloqueada(), responseAsListOfObjects.get(0).getBloqueada());
+        assertEquals(LISTA_DE_CONTAS.get(0).getAtivada(), responseAsListOfObjects.get(0).getAtivada());
+        assertEquals(LISTA_DE_CONTAS.get(0).getPortador(), responseAsListOfObjects.get(0).getPortador());
+        assertEquals(LISTA_DE_CONTAS.get(0).getSaldo(), responseAsListOfObjects.get(0).getSaldo());
     }
 }
