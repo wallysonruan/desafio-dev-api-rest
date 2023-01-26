@@ -3,10 +3,10 @@ package com.example.dock.services.impl;
 import com.example.dock.Notification;
 import com.example.dock.controllers.TransacaoMapper;
 import com.example.dock.controllers.dtos.TransacaoComandoCriarDto;
-import com.example.dock.models.Portador;
+import com.example.dock.models.Conta;
 import com.example.dock.models.Transacao;
 import com.example.dock.models.TransacaoTipo;
-import com.example.dock.repositories.PortadorRepository;
+import com.example.dock.repositories.ContaRepository;
 import com.example.dock.repositories.TransacaoRepository;
 import com.example.dock.services.TransacaoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,20 +30,20 @@ class TransacaoServiceImplTest {
     @Mock
     private TransacaoRepository transacaoRepository;
     @Mock
-    private PortadorRepository portadorRepository;
+    private ContaRepository contaRepository;
     @Mock
     private TransacaoMapper mapper;
     private Notification notification;
 
     private final Transacao TRANSACAO = Transacao.builder()
             .uuid(UUID.randomUUID())
-            .portador(Portador.builder().build())
+            .conta(Conta.builder().build())
             .transacaoTipo(TransacaoTipo.DEPOSITO)
             .dateTime(LocalDateTime.now())
             .totalDaTransacao(BigDecimal.valueOf(10.0))
             .build();
     private final TransacaoComandoCriarDto TRANSACAO_COMANDO_CRIAR_DTO = TransacaoComandoCriarDto.builder()
-            .portador(TRANSACAO.getPortador().uuid)
+            .contaUuid(TRANSACAO.getConta().uuid)
             .transacaoTipo(TRANSACAO.getTransacaoTipo())
             .totalDaTransacao(TRANSACAO.getTotalDaTransacao())
             .build();
@@ -51,13 +51,13 @@ class TransacaoServiceImplTest {
     @BeforeEach
     void setUp() {
         notification = new Notification<Transacao>();
-        service = new TransacaoServiceImpl(transacaoRepository, portadorRepository, notification);
+        service = new TransacaoServiceImpl(transacaoRepository, contaRepository, notification);
     }
 
     @Test
     void novaTransacao__quandoReceberUmTransacaoComandoCriarDtoValido__deveriaConverterParaTransacaoEPersistir(){
-        when(portadorRepository.existsById(TRANSACAO.getPortador().getUuid())).thenReturn(true);
-        when(portadorRepository.findById(TRANSACAO.getPortador().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getPortador()));
+        when(contaRepository.existsById(TRANSACAO.getConta().getUuid())).thenReturn(true);
+        when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
 
         var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO);
@@ -68,24 +68,24 @@ class TransacaoServiceImplTest {
 
     @Test
     void novaTransacao__quandoPortadorExistirRetornarSemErroComTransacaoCompleta(){
-        when(portadorRepository.existsById(TRANSACAO.getPortador().getUuid())).thenReturn(true);
-        when(portadorRepository.findById(TRANSACAO.getPortador().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getPortador()));
+        when(contaRepository.existsById(TRANSACAO.getConta().getUuid())).thenReturn(true);
+        when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
 
         var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO);
 
         assertNotNull(response);
-        assertFalse(response.getErrors().contains("Portador não encontrado."));
+        assertFalse(response.getErrors().contains("Conta não encontrada."));
         assertEquals(TRANSACAO, response.getResultado());
     }
 
     @Test
     void novaTransacao__quandoPortadorNaoExistirRetornarNotificacaoComErro(){
-        when(portadorRepository.existsById(TRANSACAO.getPortador().getUuid())).thenReturn(false);
+        when(contaRepository.existsById(TRANSACAO.getConta().getUuid())).thenReturn(false);
 
         var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO);
 
         assertNotNull(response);
-        assertTrue(response.getErrors().contains("Portador não encontrado."));
+        assertTrue(response.getErrors().contains("Conta não encontrada."));
     }
 }

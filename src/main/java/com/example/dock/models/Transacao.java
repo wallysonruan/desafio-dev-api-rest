@@ -19,8 +19,8 @@ public class Transacao {
     UUID uuid;
     LocalDateTime dateTime;
     @ManyToOne
-    @JoinColumn(name = "portador_uuid")
-    Portador portador;
+    @JoinColumn(name = "conta_uuid")
+    Conta conta;
     TransacaoTipo transacaoTipo;
     BigDecimal totalDaTransacao;
 }

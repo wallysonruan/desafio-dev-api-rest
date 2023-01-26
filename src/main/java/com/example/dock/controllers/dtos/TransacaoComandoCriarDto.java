@@ -14,6 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class TransacaoComandoCriarDto {
     public TransacaoTipo transacaoTipo;
-    public UUID portador;
+    public UUID contaUuid;
     public BigDecimal totalDaTransacao;
 }

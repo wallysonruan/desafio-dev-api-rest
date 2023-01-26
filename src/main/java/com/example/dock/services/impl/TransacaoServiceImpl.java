@@ -3,7 +3,7 @@ package com.example.dock.services.impl;
 import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.TransacaoComandoCriarDto;
 import com.example.dock.models.Transacao;
-import com.example.dock.repositories.PortadorRepository;
+import com.example.dock.repositories.ContaRepository;
 import com.example.dock.repositories.TransacaoRepository;
 import com.example.dock.services.TransacaoService;
 import org.springframework.stereotype.Service;
@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 public class TransacaoServiceImpl implements TransacaoService {
 
     private final TransacaoRepository transacaoRepository;
-    private final PortadorRepository portadorRepository;
+    private final ContaRepository contaRepository;
     private Notification notification;
 
-    public TransacaoServiceImpl(TransacaoRepository transacaoRepository, PortadorRepository portadorRepository, Notification notification) {
+    public TransacaoServiceImpl(TransacaoRepository transacaoRepository, ContaRepository contaRepository, Notification notification) {
         this.transacaoRepository = transacaoRepository;
-        this.portadorRepository = portadorRepository;
+        this.contaRepository = contaRepository;
         this.notification = notification;
     }
 
@@ -28,13 +28,13 @@ public class TransacaoServiceImpl implements TransacaoService {
     public Notification novaTransacao(TransacaoComandoCriarDto transacaoComandoCriarDto) {
         var transacao = new Transacao();
 
-        if (! portadorRepository.existsById(transacaoComandoCriarDto.portador)){
-            notification.addError("Portador não encontrado.");
+        if (! contaRepository.existsById(transacaoComandoCriarDto.contaUuid)){
+            notification.addError("Conta não encontrada.");
             return notification;
         }
 
-        var portador = portadorRepository.findById(transacaoComandoCriarDto.portador).get();
-        transacao.setPortador(portador);
+        var conta = contaRepository.findById(transacaoComandoCriarDto.contaUuid).get();
+        transacao.setConta(conta);
         transacao.setDateTime(LocalDateTime.now());
         transacao.setTransacaoTipo(transacaoComandoCriarDto.transacaoTipo);
         transacao.setTotalDaTransacao(transacaoComandoCriarDto.totalDaTransacao);

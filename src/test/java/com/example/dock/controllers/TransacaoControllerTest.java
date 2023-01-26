@@ -3,6 +3,7 @@ package com.example.dock.controllers;
 import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.TransacaoComandoCriarDto;
 import com.example.dock.controllers.dtos.TransacaoRespostaDto;
+import com.example.dock.models.Conta;
 import com.example.dock.models.Portador;
 import com.example.dock.models.Transacao;
 import com.example.dock.models.TransacaoTipo;
@@ -45,24 +46,23 @@ class TransacaoControllerTest {
             .uuid(UUID.randomUUID())
             .dateTime(LocalDateTime.now())
             .transacaoTipo(TransacaoTipo.DEPOSITO)
-            .portador(
-                    Portador.builder()
+            .conta(
+                    Conta.builder()
                     .uuid(UUID.randomUUID())
-                            .cpf("18241327005")
                     .build()
             )
             .totalDaTransacao(BigDecimal.valueOf(10.0))
             .build();
 
     private final TransacaoComandoCriarDto TRANSACAO_COMANDO_CRIAR_DTO = TransacaoComandoCriarDto.builder()
-            .portador(TRANSACAO.getPortador().getUuid())
+            .contaUuid(TRANSACAO.getConta().getUuid())
             .transacaoTipo(TRANSACAO.getTransacaoTipo())
             .totalDaTransacao(TRANSACAO.getTotalDaTransacao())
             .build();
 
     private final TransacaoRespostaDto TRANSACAO_RESPOSTA_DTO = TransacaoRespostaDto.builder()
             .uuid(TRANSACAO.getUuid())
-            .portador(TRANSACAO.getPortador())
+            .conta(TRANSACAO.getConta())
             .dateTime(TRANSACAO.getDateTime())
             .transacaoTipo(TRANSACAO.getTransacaoTipo())
             .totalDaTransacao(TRANSACAO.getTotalDaTransacao())
@@ -97,7 +97,7 @@ class TransacaoControllerTest {
         assertEquals(TRANSACAO_RESPOSTA_DTO.uuid, responseAsObject.uuid);
         assertEquals(TRANSACAO_RESPOSTA_DTO.totalDaTransacao, responseAsObject.totalDaTransacao);
         assertEquals(TRANSACAO_RESPOSTA_DTO.transacaoTipo, responseAsObject.transacaoTipo);
-        assertEquals(TRANSACAO_RESPOSTA_DTO.portador, responseAsObject.portador);
+        assertEquals(TRANSACAO_RESPOSTA_DTO.conta, responseAsObject.conta);
     }
 
     @Test
