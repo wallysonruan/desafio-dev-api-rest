@@ -67,7 +67,7 @@ class TransacaoServiceImplTest {
     }
 
     @Test
-    void novaTransacao__quandoPortadorExistirRetornarSemErroComTransacaoCompleta(){
+    void novaTransacao__quandoContaExistirRetornarSemErroComTransacaoCompleta(){
         when(contaRepository.existsById(TRANSACAO.getConta().getUuid())).thenReturn(true);
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
@@ -80,7 +80,7 @@ class TransacaoServiceImplTest {
     }
 
     @Test
-    void novaTransacao__quandoPortadorNaoExistirRetornarNotificacaoComErro(){
+    void novaTransacao__quandoContaNaoExistirRetornarNotificacaoComErro(){
         when(contaRepository.existsById(TRANSACAO.getConta().getUuid())).thenReturn(false);
 
         var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO);
