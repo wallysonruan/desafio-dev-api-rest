@@ -21,6 +21,7 @@ public class Portador {
 
     @NaturalId
     @CPF
+    @Column(unique = true)
     public String cpf;
 
     @Column

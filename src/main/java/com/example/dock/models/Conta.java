@@ -24,7 +24,7 @@ public class Conta {
 
     @NaturalId
     @OneToOne
-    @JoinColumn(name = "portador_id", referencedColumnName = "cpf")
+    @JoinColumn(name = "portador_id", referencedColumnName = "uuid")
     public Portador portador;
 
     @Column
