@@ -2,13 +2,18 @@ package com.example.dock.services.impl;
 
 import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.TransacaoComandoCriarDto;
+import com.example.dock.models.Conta;
 import com.example.dock.models.Transacao;
+import com.example.dock.models.TransacaoTipo;
 import com.example.dock.repositories.ContaRepository;
 import com.example.dock.repositories.TransacaoRepository;
 import com.example.dock.services.TransacaoService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class TransacaoServiceImpl implements TransacaoService {
@@ -16,6 +21,7 @@ public class TransacaoServiceImpl implements TransacaoService {
     private final TransacaoRepository transacaoRepository;
     private final ContaRepository contaRepository;
     private Notification notification;
+    private Conta conta = new Conta();
 
     public TransacaoServiceImpl(TransacaoRepository transacaoRepository, ContaRepository contaRepository, Notification notification) {
         this.transacaoRepository = transacaoRepository;
@@ -23,25 +29,65 @@ public class TransacaoServiceImpl implements TransacaoService {
         this.notification = notification;
     }
 
-
     @Override
-    public Notification novaTransacao(TransacaoComandoCriarDto transacaoComandoCriarDto) {
-        var transacao = new Transacao();
+    public Notification<Transacao> novaTransacao(TransacaoComandoCriarDto transacaoComandoCriarDto) {
+        notification = new Notification<Transacao>();
+        buscarConta(transacaoComandoCriarDto.contaUuid);
 
-        if (! contaRepository.existsById(transacaoComandoCriarDto.contaUuid)){
-            notification.addError("Conta não encontrada.");
+        if (notification.hasErrors()){
             return notification;
         }
 
-        var conta = contaRepository.findById(transacaoComandoCriarDto.contaUuid).get();
+        atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
+
+        if (notification.hasErrors()){
+            return notification;
+        }
+
+        var transacao = new Transacao();
         transacao.setConta(conta);
         transacao.setDateTime(LocalDateTime.now());
         transacao.setTransacaoTipo(transacaoComandoCriarDto.transacaoTipo);
         transacao.setTotalDaTransacao(transacaoComandoCriarDto.totalDaTransacao);
+        transacao.setSaldo(conta.getSaldo());
 
-        var response = transacaoRepository.save(transacao);
-        notification.setResultado(response);
+        transacao = transacaoRepository.save(transacao);
+        notification.setResultado(transacao);
 
         return notification;
+    }
+    private void buscarConta(UUID contaUuid){
+        Optional<Conta> conta = contaRepository.findById(contaUuid);
+
+        if (conta.isEmpty()){
+            notification.addError("Conta não encontrada.");
+        }else{
+            this.conta = conta.get();
+        }
+    }
+    private void atualizarSaldoDaConta(TransacaoTipo transacaoTipo, BigDecimal valorDaTransacao) {
+        if (transacaoTipo == TransacaoTipo.SAQUE){
+            saque(valorDaTransacao);
+        }else{
+            deposito(valorDaTransacao);
+        }
+    }
+    private void saque(BigDecimal valorDaTransacao) {
+        if (saquePermitido(conta.saldo, valorDaTransacao)) {
+            conta.setSaldo(conta.saldo.subtract(valorDaTransacao));
+        }else{
+            notification.addError("Saldo insuficiente.");
+        }
+    }
+    private boolean saquePermitido(BigDecimal contaSaldo, BigDecimal valorDaTransacao){
+        BigDecimal saldoFinal = contaSaldo.subtract(valorDaTransacao);
+
+        if (saldoFinal.compareTo(BigDecimal.ZERO) == -1){
+            return false;
+        }
+        return true;
+    }
+    private void deposito(BigDecimal valorDaTransacao){
+        conta.setSaldo(conta.saldo.add(valorDaTransacao));
     }
 }

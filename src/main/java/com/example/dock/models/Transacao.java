@@ -16,14 +16,15 @@ public class Transacao {
     @Id
     @GeneratedValue(generator = "uuid")
     @Setter(AccessLevel.NONE)
-    UUID uuid;
+    public UUID uuid;
     @Column(name = "date_time")
-    LocalDateTime dateTime;
-    @ManyToOne
-    @JoinColumn(name = "conta_uuid")
-    Conta conta;
+    public LocalDateTime dateTime;
     @Column(name = "transacao_tipo")
-    TransacaoTipo transacaoTipo;
+    public TransacaoTipo transacaoTipo;
     @Column(name = "total_da_transacao")
-    BigDecimal totalDaTransacao;
+    public BigDecimal totalDaTransacao;
+    public BigDecimal saldo;
+    @ManyToOne
+    @JoinColumn(name = "conta_uuid", referencedColumnName = "uuid")
+    public Conta conta;
 }

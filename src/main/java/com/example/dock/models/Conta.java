@@ -27,16 +27,13 @@ public class Conta {
     @JoinColumn(name = "portador_id", referencedColumnName = "uuid")
     public Portador portador;
 
-    @Column
     public BigDecimal saldo;
 
     @ManyToOne
     @JoinColumn(name = "agencia_id", referencedColumnName = "id")
     public Agencia agencia;
 
-    @Column
     public Boolean ativada;
 
-    @Column
     public Boolean bloqueada;
 }

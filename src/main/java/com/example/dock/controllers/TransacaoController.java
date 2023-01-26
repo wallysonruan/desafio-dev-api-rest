@@ -23,8 +23,13 @@ public class TransacaoController {
 
     @PostMapping
     public ResponseEntity<?> novaTransacao(@RequestBody @Valid TransacaoComandoCriarDto transacaoComandoCriarDto){
-        var response = service.novaTransacao(transacaoComandoCriarDto);
-        return new ResponseEntity<>(response.getResultado(), HttpStatus.CREATED);
+        var notification = service.novaTransacao(transacaoComandoCriarDto);
+
+        if(notification.hasErrors()){
+            return new ResponseEntity<>(notification.getErrors(), HttpStatus.FORBIDDEN);
+        }
+
+        return new ResponseEntity<>(notification.getResultado(), HttpStatus.CREATED);
     }
 
 }

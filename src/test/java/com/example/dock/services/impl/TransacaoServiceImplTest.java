@@ -1,9 +1,9 @@
 package com.example.dock.services.impl;
 
 import com.example.dock.Notification;
-import com.example.dock.controllers.TransacaoMapper;
 import com.example.dock.controllers.dtos.TransacaoComandoCriarDto;
 import com.example.dock.models.Conta;
+import com.example.dock.models.Portador;
 import com.example.dock.models.Transacao;
 import com.example.dock.models.TransacaoTipo;
 import com.example.dock.repositories.ContaRepository;
@@ -31,20 +31,30 @@ class TransacaoServiceImplTest {
     private TransacaoRepository transacaoRepository;
     @Mock
     private ContaRepository contaRepository;
-    @Mock
-    private TransacaoMapper mapper;
     private Notification notification;
 
     private final Transacao TRANSACAO = Transacao.builder()
             .uuid(UUID.randomUUID())
-            .conta(Conta.builder().build())
+            .conta(Conta.builder()
+                    .uuid(UUID.randomUUID())
+                    .portador(Portador.builder().build())
+                    .bloqueada(false)
+                    .ativada(true)
+                    .saldo(BigDecimal.valueOf(10))
+                    .build())
             .transacaoTipo(TransacaoTipo.DEPOSITO)
             .dateTime(LocalDateTime.now())
             .totalDaTransacao(BigDecimal.valueOf(10.0))
             .build();
-    private final TransacaoComandoCriarDto TRANSACAO_COMANDO_CRIAR_DTO = TransacaoComandoCriarDto.builder()
+    private final TransacaoComandoCriarDto TRANSACAO_COMANDO_CRIAR_DTO_DEPOSITO = TransacaoComandoCriarDto.builder()
             .contaUuid(TRANSACAO.getConta().uuid)
             .transacaoTipo(TRANSACAO.getTransacaoTipo())
+            .totalDaTransacao(TRANSACAO.getTotalDaTransacao())
+            .build();
+
+    private final TransacaoComandoCriarDto TRANSACAO_COMANDO_CRIAR_DTO_SAQUE = TransacaoComandoCriarDto.builder()
+            .contaUuid(TRANSACAO.getConta().uuid)
+            .transacaoTipo(TransacaoTipo.SAQUE)
             .totalDaTransacao(TRANSACAO.getTotalDaTransacao())
             .build();
 
@@ -56,11 +66,10 @@ class TransacaoServiceImplTest {
 
     @Test
     void novaTransacao__quandoReceberUmTransacaoComandoCriarDtoValido__deveriaConverterParaTransacaoEPersistir(){
-        when(contaRepository.existsById(TRANSACAO.getConta().getUuid())).thenReturn(true);
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
 
-        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO);
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_DEPOSITO);
 
         verify(transacaoRepository, times(1)).save(any());
         assertNotNull(response);
@@ -68,11 +77,10 @@ class TransacaoServiceImplTest {
 
     @Test
     void novaTransacao__quandoContaExistirRetornarSemErroComTransacaoCompleta(){
-        when(contaRepository.existsById(TRANSACAO.getConta().getUuid())).thenReturn(true);
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
 
-        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO);
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_DEPOSITO);
 
         assertNotNull(response);
         assertFalse(response.getErrors().contains("Conta não encontrada."));
@@ -81,11 +89,48 @@ class TransacaoServiceImplTest {
 
     @Test
     void novaTransacao__quandoContaNaoExistirRetornarNotificacaoComErro(){
-        when(contaRepository.existsById(TRANSACAO.getConta().getUuid())).thenReturn(false);
+        when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.empty());
 
-        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO);
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_DEPOSITO);
 
         assertNotNull(response);
         assertTrue(response.getErrors().contains("Conta não encontrada."));
+    }
+
+    @Test
+    void novaTransacao__quandoReceberTransacaoTipoDeposito__deveriaAcrescentarAoSaldoDaConta(){
+        when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
+        when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
+
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_DEPOSITO);
+
+        assertEquals(BigDecimal.valueOf(20.0), response.getResultado().getConta().getSaldo());
+    }
+
+    @Test
+    void novaTransacao__quandoReceberTransacaoTipoSaque__deveriaSubtrairDoSaldoDaConta(){
+        when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
+        when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
+
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_SAQUE);
+
+        assertEquals(BigDecimal.valueOf(0.0), response.getResultado().getConta().getSaldo());
+    }
+
+    @Test
+    void novaTransacao__quandoReceberTransacaoTipoSaqueComValorMaiorAoSaldo__deveriaRetornarNotificationComErro(){
+        when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
+
+        TransacaoComandoCriarDto transacao_comando_criar_dto_saque_valor_extrapola = TransacaoComandoCriarDto.builder()
+            .contaUuid(TRANSACAO.getConta().uuid)
+            .transacaoTipo(TransacaoTipo.SAQUE)
+            .totalDaTransacao(BigDecimal.valueOf(2000))
+            .build();
+
+        var response = service.novaTransacao(transacao_comando_criar_dto_saque_valor_extrapola);
+
+        assertNull(response.getResultado());
+        assertTrue(response.hasErrors());
+        assertTrue(response.getErrors().contains("Saldo insuficiente."));
     }
 }

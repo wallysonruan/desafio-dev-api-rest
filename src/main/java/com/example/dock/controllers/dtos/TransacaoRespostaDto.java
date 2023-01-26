@@ -19,4 +19,5 @@ public class TransacaoRespostaDto {
     public TransacaoTipo transacaoTipo;
     public BigDecimal totalDaTransacao;
     public Conta conta;
+    public BigDecimal saldo;
 }
