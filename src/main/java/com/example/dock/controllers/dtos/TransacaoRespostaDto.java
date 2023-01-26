@@ -17,6 +17,6 @@ public class TransacaoRespostaDto {
     public UUID uuid;
     public LocalDateTime dateTime;
     public TransacaoTipo transacaoTipo;
-    public Conta conta;
     public BigDecimal totalDaTransacao;
+    public Conta conta;
 }

@@ -32,7 +32,7 @@ public class PortadorServiceImpl implements PortadorService {
         };
 
         portador.setCpf(portadorComandoCriarDto.getCpf());
-        portador.setNome_completo(portadorComandoCriarDto.getNome_completo());
+        portador.setNomeCompleto(portadorComandoCriarDto.getNomeCompleto());
         notification.setResultado(repository.save(portador));
         return notification;
     }

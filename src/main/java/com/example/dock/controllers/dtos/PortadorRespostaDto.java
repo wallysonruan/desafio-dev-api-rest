@@ -14,5 +14,5 @@ import java.util.UUID;
 public class PortadorRespostaDto {
     public UUID uuid;
     public String cpf;
-    public String nome_completo;
+    public String nomeCompleto;
 }

@@ -49,16 +49,16 @@ class PortadorControllerTest {
     private final String NOME_COMPLETO = "Oliver Manoel Anthony Novaes";
     private final PortadorComandoCriarDto PORTADOR_COMANDO_CRIAR = PortadorComandoCriarDto.builder()
             .cpf(CPF)
-            .nome_completo(NOME_COMPLETO)
+            .nomeCompleto(NOME_COMPLETO)
             .build();
     private final Portador PORTADOR = Portador.builder()
             .cpf(CPF)
-            .nome_completo(NOME_COMPLETO)
+            .nomeCompleto(NOME_COMPLETO)
             .build();
     private final PortadorRespostaDto PORTADOR_RESPOSTA_DTO = PortadorRespostaDto.builder()
             .uuid(UUID_DEFAULT)
             .cpf(CPF)
-            .nome_completo(NOME_COMPLETO)
+            .nomeCompleto(NOME_COMPLETO)
             .build();
 
     @Test
@@ -81,7 +81,7 @@ class PortadorControllerTest {
         Assertions.assertEquals(PortadorRespostaDto.class, json_as_portador_resposta_dto.getClass());
         Assertions.assertNotNull(json_as_portador_resposta_dto.getUuid());
         Assertions.assertNotNull(json_as_portador_resposta_dto.getCpf());
-        Assertions.assertNotNull(json_as_portador_resposta_dto.getNome_completo());
+        Assertions.assertNotNull(json_as_portador_resposta_dto.getNomeCompleto());
     }
 
     @Test

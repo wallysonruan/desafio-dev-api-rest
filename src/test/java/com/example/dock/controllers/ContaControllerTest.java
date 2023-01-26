@@ -45,7 +45,7 @@ class ContaControllerTest {
     private final UUID UUID_DEFAULT = UUID.randomUUID();
     private final Portador PORTADOR = Portador.builder()
             .cpf("18241327005")
-            .nome_completo("Oliver Manoel Anthony Novaes")
+            .nomeCompleto("Oliver Manoel Anthony Novaes")
             .build();
     private final BigDecimal SALDO = BigDecimal.valueOf(13.4);
     private final Agencia AGENCIA = Agencia.builder()

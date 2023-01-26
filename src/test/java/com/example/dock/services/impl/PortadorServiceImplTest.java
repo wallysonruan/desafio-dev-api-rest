@@ -30,15 +30,15 @@ public class PortadorServiceImplTest {
     private final Portador PORTADOR = Portador.builder()
             .uuid(UUID.randomUUID())
             .cpf(CPF)
-            .nome_completo(NOME_COMPLETO)
+            .nomeCompleto(NOME_COMPLETO)
             .build();
     private final Portador PORTADOR_SEM_UUID = Portador.builder()
             .cpf(CPF)
-            .nome_completo(NOME_COMPLETO)
+            .nomeCompleto(NOME_COMPLETO)
             .build();
     private final PortadorComandoCriarDto PORTADOR_COMANDO_CRIAR_DTO = PortadorComandoCriarDto.builder()
             .cpf(CPF)
-            .nome_completo(NOME_COMPLETO)
+            .nomeCompleto(NOME_COMPLETO)
             .build();
 
     @BeforeEach

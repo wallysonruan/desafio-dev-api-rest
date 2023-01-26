@@ -24,8 +24,8 @@ public class Portador {
     @Column(unique = true)
     public String cpf;
 
-    @Column
-    public String nome_completo;
+    @Column(name = "nome_completo")
+    public String nomeCompleto;
 
     public void setCpf(String cpf){
         this.cpf = cpf.replaceAll("[^0-9]", "");
