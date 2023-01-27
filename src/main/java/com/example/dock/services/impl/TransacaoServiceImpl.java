@@ -32,15 +32,12 @@ public class TransacaoServiceImpl implements TransacaoService {
     @Override
     public Notification<Transacao> novaTransacao(TransacaoComandoCriarDto transacaoComandoCriarDto) {
         notification = new Notification<Transacao>();
-        buscarConta(transacaoComandoCriarDto.contaUuid);
 
-        if (notification.hasErrors()){
-            return notification;
-        }
-
-        atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
-
-        if (notification.hasErrors()){
+        try{
+            buscarConta(transacaoComandoCriarDto.contaUuid);
+            atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
+        }catch (NullPointerException e){
+            notification.addError("Conta não encontrada.");
             return notification;
         }
 
