@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ public class TransacaoServiceImpl implements TransacaoService {
         try{
             buscarConta(transacaoComandoCriarDto.contaUuid);
             atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
-        }catch (NullPointerException e){
+        }catch (NoSuchElementException e){
             notification.addError("Conta não encontrada.");
             return notification;
         }
@@ -55,12 +56,7 @@ public class TransacaoServiceImpl implements TransacaoService {
     }
     private void buscarConta(UUID contaUuid){
         Optional<Conta> conta = contaRepository.findById(contaUuid);
-
-        if (conta.isEmpty()){
-            notification.addError("Conta não encontrada.");
-        }else{
-            this.conta = conta.get();
-        }
+        this.conta = conta.get();
     }
     private void atualizarSaldoDaConta(TransacaoTipo transacaoTipo, BigDecimal valorDaTransacao) {
         if (transacaoTipo == TransacaoTipo.SAQUE){
