@@ -108,6 +108,36 @@ class TransacaoServiceImplTest {
     }
 
     @Test
+    void novaTransacao_quandoTransacaoTipoDepositoValorNegativo__deveriaRetornarNotificacaoComErro(){
+        when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
+
+        var transacao_comando_criar_dto_deposito_valor_negativo = TransacaoComandoCriarDto.builder()
+                .contaUuid(TRANSACAO.getConta().uuid)
+                .transacaoTipo(TransacaoTipo.DEPOSITO)
+                .totalDaTransacao(BigDecimal.valueOf(-1))
+                .build();
+
+        var response = service.novaTransacao(transacao_comando_criar_dto_deposito_valor_negativo);
+
+        assertTrue(response.getErrors().contains("Valor de depósito não pode ser menor ou igual a 0."));
+    }
+
+    @Test
+    void novaTransacao_quandoTransacaoTipoDepositoValorIgualAZero__deveriaRetornarNotificacaoComErro(){
+        when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
+
+        var transacao_comando_criar_dto_deposito_valor_negativo = TransacaoComandoCriarDto.builder()
+                .contaUuid(TRANSACAO.getConta().uuid)
+                .transacaoTipo(TransacaoTipo.DEPOSITO)
+                .totalDaTransacao(BigDecimal.valueOf(0))
+                .build();
+
+        var response = service.novaTransacao(transacao_comando_criar_dto_deposito_valor_negativo);
+
+        assertTrue(response.getErrors().contains("Valor de depósito não pode ser menor ou igual a 0."));
+    }
+
+    @Test
     void novaTransacao_quandoTransacaoTipoSaqueValida__deveriaSubtrairDoSaldoDaConta(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);

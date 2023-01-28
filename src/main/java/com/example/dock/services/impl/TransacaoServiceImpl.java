@@ -81,6 +81,10 @@ public class TransacaoServiceImpl implements TransacaoService {
         return true;
     }
     private void deposito(BigDecimal valorDaTransacao){
-        conta.setSaldo(conta.saldo.add(valorDaTransacao));
+        if (valorDaTransacao.compareTo(BigDecimal.ZERO) == -1 || valorDaTransacao.compareTo(BigDecimal.ZERO) == 0 ){
+            notification.addError("Valor de depósito não pode ser menor ou igual a 0.");
+        }else {
+            conta.setSaldo(conta.saldo.add(valorDaTransacao));
+        }
     }
 }
