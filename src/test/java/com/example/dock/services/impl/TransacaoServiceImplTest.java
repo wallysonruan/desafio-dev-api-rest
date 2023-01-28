@@ -65,7 +65,7 @@ class TransacaoServiceImplTest {
     }
 
     @Test
-    void novaTransacao__quandoReceberUmTransacaoComandoCriarDtoValido__deveriaConverterParaTransacaoEPersistir(){
+    void novaTransacao_quandoTransacaoComandoCriarDtoValido__deveriaConverterParaTransacaoEPersistir(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
 
@@ -76,7 +76,7 @@ class TransacaoServiceImplTest {
     }
 
     @Test
-    void novaTransacao__quandoContaExistirRetornarSemErroComTransacaoCompleta(){
+    void novaTransacao_quandoContaExistirRetornarSemErroComTransacaoCompleta(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
 
@@ -88,7 +88,7 @@ class TransacaoServiceImplTest {
     }
 
     @Test
-    void novaTransacao__quandoContaNaoExistirRetornarNotificacaoComErro(){
+    void novaTransacao_quandoContaNaoExistir_RetornarNotificacaoComErro(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.empty());
 
         var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_DEPOSITO);
@@ -98,7 +98,7 @@ class TransacaoServiceImplTest {
     }
 
     @Test
-    void novaTransacao__quandoReceberTransacaoTipoDeposito__deveriaAcrescentarAoSaldoDaConta(){
+    void novaTransacao_quandoTransacaoTipoDepositoValido__deveriaAcrescentarAoSaldoDaConta(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
 
@@ -108,7 +108,7 @@ class TransacaoServiceImplTest {
     }
 
     @Test
-    void novaTransacao__quandoReceberTransacaoTipoSaque__deveriaSubtrairDoSaldoDaConta(){
+    void novaTransacao_quandoTransacaoTipoSaqueValida__deveriaSubtrairDoSaldoDaConta(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
         when(transacaoRepository.save(any())).thenReturn(TRANSACAO);
 
@@ -118,7 +118,7 @@ class TransacaoServiceImplTest {
     }
 
     @Test
-    void novaTransacao__quandoReceberTransacaoTipoSaqueComValorMaiorAoSaldo__deveriaRetornarNotificationComErro(){
+    void novaTransacao_quandoTransacaoTipoSaqueComValorMaiorAoSaldo__deveriaRetornarNotificationComErro(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
 
         TransacaoComandoCriarDto transacao_comando_criar_dto_saque_valor_extrapola = TransacaoComandoCriarDto.builder()
