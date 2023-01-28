@@ -17,8 +17,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -162,5 +164,49 @@ class TransacaoServiceImplTest {
         assertNull(response.getResultado());
         assertTrue(response.hasErrors());
         assertTrue(response.getErrors().contains("Saldo insuficiente."));
+    }
+    @Test
+    void novaTransacao_quandoSomaDosSaqueDiariosMaisValorSaqueSolicitadoIgualarAoLimiteDiario__deveriaRetornarNotificationComErro(){
+        List<Transacao> listaDeTransacao = new ArrayList<>();
+        Transacao transacaoHoje = Transacao.builder()
+                .uuid(UUID.randomUUID())
+                .conta(Conta.builder()
+                        .uuid(UUID.randomUUID())
+                        .portador(Portador.builder().build())
+                        .bloqueada(false)
+                        .ativada(true)
+                        .saldo(BigDecimal.valueOf(10))
+                        .build())
+                .transacaoTipo(TransacaoTipo.SAQUE)
+                .dateTime(LocalDateTime.now())
+                .totalDaTransacao(BigDecimal.valueOf(1900))
+                .build();
+
+        Transacao transacaoOntem = Transacao.builder()
+                .uuid(UUID.randomUUID())
+                .conta(Conta.builder()
+                        .uuid(UUID.randomUUID())
+                        .portador(Portador.builder().build())
+                        .bloqueada(false)
+                        .ativada(true)
+                        .saldo(BigDecimal.valueOf(10))
+                        .build())
+                .transacaoTipo(TransacaoTipo.SAQUE)
+                .dateTime(LocalDateTime.now().minusDays(1))
+                .totalDaTransacao(BigDecimal.valueOf(10.0))
+                .build();
+        listaDeTransacao.add(transacaoHoje);
+        listaDeTransacao.add(transacaoHoje);
+        listaDeTransacao.add(transacaoOntem);
+
+        when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
+        when(transacaoRepository.existsByConta_Uuid(TRANSACAO.getConta().uuid)).thenReturn(true);
+        when(transacaoRepository.findByConta_Uuid(TRANSACAO.getConta().uuid)).thenReturn(listaDeTransacao);
+
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_SAQUE);
+
+        assertNull(response.getResultado());
+        assertTrue(response.hasErrors());
+        assertTrue(response.getErrors().contains("Saque não permitido, pois ultrapassaria o limite diário."));
     }
 }
