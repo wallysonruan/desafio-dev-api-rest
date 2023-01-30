@@ -37,7 +37,7 @@ public class TransacaoServiceImpl implements TransacaoService {
 
         try{
             buscarConta(transacaoComandoCriarDto.contaUuid);
-            atualizarSaldoDaConta(LocalDate.now(), transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
+            atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
         }catch (NoSuchElementException e){
             notification.addError("Conta não encontrada.");
             return notification;
@@ -59,15 +59,15 @@ public class TransacaoServiceImpl implements TransacaoService {
         Optional<Conta> conta = contaRepository.findById(contaUuid);
         this.conta = conta.get();
     }
-    private void atualizarSaldoDaConta(LocalDate date, TransacaoTipo transacaoTipo, BigDecimal valorDaTransacao) {
+    private void atualizarSaldoDaConta(TransacaoTipo transacaoTipo, BigDecimal valorDaTransacao) {
         if (transacaoTipo == TransacaoTipo.SAQUE){
-            saque(date, valorDaTransacao);
+            saque(valorDaTransacao);
         }else{
             deposito(valorDaTransacao);
         }
     }
-    private void saque(LocalDate date, BigDecimal valorDaTransacao) {
-        if (saquePermitido(date, conta.saldo, valorDaTransacao)) {
+    private void saque(BigDecimal valorDaTransacao) {
+        if (saquePermitido(conta.saldo, valorDaTransacao)) {
             conta.setSaldo(conta.saldo.subtract(valorDaTransacao));
         }else{
             notification.addError("Saldo insuficiente.");
@@ -82,16 +82,16 @@ public class TransacaoServiceImpl implements TransacaoService {
         }
     }
 
-    private boolean saquePermitido(LocalDate date, BigDecimal contaSaldo, BigDecimal valorDaTransacao){
+    private boolean saquePermitido(BigDecimal contaSaldo, BigDecimal valorDaTransacao){
         BigDecimal saldoFinal = contaSaldo.subtract(valorDaTransacao);
 
-        if (saldoFinal.compareTo(BigDecimal.ZERO) == -1 || limiteDiarioDeSaqueExtrapolado(date, valorDaTransacao)){
+        if (saldoFinal.compareTo(BigDecimal.ZERO) == -1 || limiteDiarioDeSaqueExtrapolado(valorDaTransacao)){
             return false;
         }
         return true;
     }
 
-    private boolean limiteDiarioDeSaqueExtrapolado(LocalDate date, BigDecimal valorDaTransacao) {
+    private boolean limiteDiarioDeSaqueExtrapolado(BigDecimal valorDaTransacao) {
         List<Transacao> listaDeTransacoesEfetuadas = buscarTransacoesEfetuadas();
         List<Transacao> listaDeTransacoesDiarias;
         List<BigDecimal> valoresSacados = new ArrayList<>();
