@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,6 +73,15 @@ public class TransacaoServiceImpl implements TransacaoService {
             notification.addError("Saldo insuficiente.");
         }
     }
+
+    private void deposito(BigDecimal valorDaTransacao){
+        if (valorDaTransacao.compareTo(BigDecimal.ZERO) == -1 || valorDaTransacao.compareTo(BigDecimal.ZERO) == 0 ){
+            notification.addError("Valor de depósito não pode ser menor ou igual a 0.");
+        }else {
+            conta.setSaldo(conta.saldo.add(valorDaTransacao));
+        }
+    }
+
     private boolean saquePermitido(LocalDate date, BigDecimal contaSaldo, BigDecimal valorDaTransacao){
         BigDecimal saldoFinal = contaSaldo.subtract(valorDaTransacao);
 
@@ -86,39 +92,44 @@ public class TransacaoServiceImpl implements TransacaoService {
     }
 
     private boolean limiteDiarioDeSaqueExtrapolado(LocalDate date, BigDecimal valorDaTransacao) {
-        List<Transacao> listaDeTransacoesEfetuadas;
+        List<Transacao> listaDeTransacoesEfetuadas = buscarTransacoesEfetuadas();
         List<Transacao> listaDeTransacoesDiarias;
-        BigDecimal totalSaqueDiario = valorDaTransacao;
+        List<BigDecimal> valoresSacados = new ArrayList<>();
+        BigDecimal totalSaqueDiario;
 
-        try {
-            listaDeTransacoesEfetuadas = transacaoRepository.findByConta_Uuid(conta.uuid);
-            listaDeTransacoesDiarias = listaDeTransacoesEfetuadas.stream().filter(
-                    transacao -> transacao.getTransacaoTipo() == TransacaoTipo.SAQUE && transacao.getDateTime().toLocalDate().isEqual(LocalDate.now())).collect(Collectors.toList());
+        if (listaDeTransacoesEfetuadas.isEmpty()){
+            return false;
+        }else{
+            listaDeTransacoesDiarias = listaDeTransacoesEfetuadas.stream()
+                    .filter(transacao ->
+                        transacao.getTransacaoTipo() == TransacaoTipo.SAQUE && transacao.getDateTime().toLocalDate().isEqual(LocalDate.now())
+                     ).collect(Collectors.toList());
 
-//            listaDeTransacoesDiarias.stream().forEach(transacao -> totalSaqueDiario.add(transacao.getTotalDaTransacao()));
+            listaDeTransacoesDiarias.forEach(transacao -> {
+                valoresSacados.add(transacao.getTotalDaTransacao());
+            });
 
-            for (int i = 0; i < listaDeTransacoesDiarias.size(); i++){
-                totalSaqueDiario.add(listaDeTransacoesDiarias.get(i).getTotalDaTransacao());
+            totalSaqueDiario = valoresSacados.stream().reduce(BigDecimal.valueOf(0), (subtotal, proximo) -> BigDecimal.valueOf(subtotal.intValue() + proximo.intValue()));
+
+            switch (totalSaqueDiario.compareTo(LIMITE_DIARIO_SAQUE)){
+                case -1:
+                case 0:
+                    return false;
+                case 1:
+                    notification.addError("Saque não permitido, pois ultrapassaria o limite diário.");
+                    return true;
             }
-
-            if (totalSaqueDiario.compareTo(LIMITE_DIARIO_SAQUE) == -1) {
-                return false;
-            } else {
-                notification.addError("Saque não permitido, pois ultrapassaria o limite diário.");
-                return true;
-            }
-        } catch (Exception e) {
-            System.out.println(e);
         }
-
         return false;
     }
 
-    private void deposito(BigDecimal valorDaTransacao){
-        if (valorDaTransacao.compareTo(BigDecimal.ZERO) == -1 || valorDaTransacao.compareTo(BigDecimal.ZERO) == 0 ){
-            notification.addError("Valor de depósito não pode ser menor ou igual a 0.");
-        }else {
-            conta.setSaldo(conta.saldo.add(valorDaTransacao));
+    private List<Transacao> buscarTransacoesEfetuadas(){
+        List<Transacao> transacoes = new ArrayList<>();
+        try{
+            var transacoesDiarias = transacaoRepository.findByConta_Uuid(conta.uuid);
+            transacoesDiarias.stream().forEach(transacao -> transacoes.add(transacao));
+        }catch (NullPointerException e){
         }
+        return transacoes;
     }
 }

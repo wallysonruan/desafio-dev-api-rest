@@ -200,11 +200,11 @@ class TransacaoServiceImplTest {
         listaDeTransacao.add(transacaoOntem);
 
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
-        when(transacaoRepository.existsByConta_Uuid(TRANSACAO.getConta().uuid)).thenReturn(true);
         when(transacaoRepository.findByConta_Uuid(TRANSACAO.getConta().uuid)).thenReturn(listaDeTransacao);
 
         var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_SAQUE);
 
+        verify(transacaoRepository, times(1)).findByConta_Uuid(any());
         assertNull(response.getResultado());
         assertTrue(response.hasErrors());
         assertTrue(response.getErrors().contains("Saque não permitido, pois ultrapassaria o limite diário."));
