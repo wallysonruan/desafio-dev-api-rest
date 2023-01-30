@@ -34,6 +34,7 @@ public class ContaServiceImpl implements ContaService {
 
     @Override
     public Notification criarConta(ContaComandoCriarDto contaComandoCriarDTO) {
+        notification = new Notification();
 
         verificaSePortadorExiste(contaComandoCriarDTO.portador);
         verificaSeAgenciaExiste(contaComandoCriarDTO.agencia);
@@ -65,11 +66,13 @@ public class ContaServiceImpl implements ContaService {
     private void verificaSePortadorExiste(UUID portadorUuid){
         if(portadorRepository.existsById(portadorUuid)){
             this.notification.addError("Portador já tem conta cadastrada.");
+            notification.addError("Portador já tem conta cadastrada.");
         }
     }
     private void verificaSeAgenciaExiste(Long agenciaId){
         if(! agenciaRepository.existsById(agenciaId)){
             this.notification.addError("Agência não cadastrada.");
+            notification.addError("Agência não cadastrada.");
         }
     }
 }
