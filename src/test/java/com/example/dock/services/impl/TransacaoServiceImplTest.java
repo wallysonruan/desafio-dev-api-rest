@@ -76,7 +76,6 @@ class TransacaoServiceImplTest {
         verify(transacaoRepository, times(1)).save(any());
         assertNotNull(response);
     }
-
     @Test
     void novaTransacao_quandoContaExistirRetornarSemErroComTransacaoCompleta(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
@@ -87,8 +86,9 @@ class TransacaoServiceImplTest {
         assertNotNull(response);
         assertFalse(response.getErrors().contains("Conta não encontrada."));
         assertEquals(TRANSACAO, response.getResultado());
+        assertTrue(response.getResultado().getConta().ativada);
+        assertFalse(response.getResultado().getConta().bloqueada);
     }
-
     @Test
     void novaTransacao_quandoContaNaoExistir_RetornarNotificacaoComErro(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.empty());
@@ -98,7 +98,6 @@ class TransacaoServiceImplTest {
         assertNotNull(response);
         assertTrue(response.getErrors().contains("Conta não encontrada."));
     }
-
     @Test
     void novaTransacao_quandoTransacaoTipoDepositoValido__deveriaAcrescentarAoSaldoDaConta(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
@@ -107,8 +106,22 @@ class TransacaoServiceImplTest {
         var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_DEPOSITO);
 
         assertEquals(BigDecimal.valueOf(20.0), response.getResultado().getConta().getSaldo());
+        assertTrue(response.getResultado().getConta().ativada);
+        assertFalse(response.getResultado().getConta().bloqueada);
     }
+    @Test
+    void novaTransacao_quandoTransacaoTipoDepositoComContaDesativada__deveriaRetornarNotificacaoComErro(){
+        Conta contaDesativada = Conta.builder()
+                .ativada(false)
+                .build();
 
+        when(contaRepository.findById(any())).thenReturn(Optional.ofNullable(contaDesativada));
+
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_DEPOSITO);
+
+        assertTrue(response.hasErrors());
+        assertTrue(response.getErrors().contains("A conta está desativada."));
+    }
     @Test
     void novaTransacao_quandoTransacaoTipoDepositoValorNegativo__deveriaRetornarNotificacaoComErro(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
@@ -123,7 +136,6 @@ class TransacaoServiceImplTest {
 
         assertTrue(response.getErrors().contains("Valor de depósito não pode ser menor ou igual a 0."));
     }
-
     @Test
     void novaTransacao_quandoTransacaoTipoDepositoValorIgualAZero__deveriaRetornarNotificacaoComErro(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
@@ -138,7 +150,6 @@ class TransacaoServiceImplTest {
 
         assertTrue(response.getErrors().contains("Valor de depósito não pode ser menor ou igual a 0."));
     }
-
     @Test
     void novaTransacao_quandoTransacaoTipoSaqueValida__deveriaSubtrairDoSaldoDaConta(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
@@ -147,8 +158,22 @@ class TransacaoServiceImplTest {
         var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_SAQUE);
 
         assertEquals(BigDecimal.valueOf(0.0), response.getResultado().getConta().getSaldo());
+        assertTrue(response.getResultado().getConta().ativada);
+        assertFalse(response.getResultado().getConta().bloqueada);
     }
+    @Test
+    void novaTransacao_quandoTransacaoTipoSaqueComContaDesativada__deveriaRetornarNotificacaoComErro(){
+        Conta contaDesativada = Conta.builder()
+                .ativada(false)
+                .build();
 
+        when(contaRepository.findById(any())).thenReturn(Optional.ofNullable(contaDesativada));
+
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_SAQUE);
+
+        assertTrue(response.hasErrors());
+        assertTrue(response.getErrors().contains("A conta está desativada."));
+    }
     @Test
     void novaTransacao_quandoTransacaoTipoSaqueComValorMaiorAoSaldo__deveriaRetornarNotificationComErro(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));

@@ -24,20 +24,22 @@ public class TransacaoServiceImpl implements TransacaoService {
     private Notification notification;
     private Conta conta = new Conta();
     private final BigDecimal LIMITE_DIARIO_SAQUE = BigDecimal.valueOf(2000);
-
     public TransacaoServiceImpl(TransacaoRepository transacaoRepository, ContaRepository contaRepository, Notification notification) {
         this.transacaoRepository = transacaoRepository;
         this.contaRepository = contaRepository;
         this.notification = notification;
     }
-
     @Override
     public Notification<Transacao> novaTransacao(TransacaoComandoCriarDto transacaoComandoCriarDto) {
         notification = new Notification<Transacao>();
 
         try{
             buscarConta(transacaoComandoCriarDto.contaUuid);
-            atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
+            if (conta.ativada){
+                atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
+            }else{
+                notification.addError("A conta está desativada.");
+            }
         }catch (NoSuchElementException e){
             notification.addError("Conta não encontrada.");
             return notification;
@@ -66,12 +68,15 @@ public class TransacaoServiceImpl implements TransacaoService {
             deposito(valorDaTransacao);
         }
     }
-    private void saque(BigDecimal valorDaTransacao) {
-        if (saquePermitido(conta.saldo, valorDaTransacao)) {
-            conta.setSaldo(conta.saldo.subtract(valorDaTransacao));
+    private List<Transacao> buscarTransacoesEfetuadas(){
+        List<Transacao> transacoes = new ArrayList<>();
+        try{
+            var transacoesDiarias = transacaoRepository.findByConta_Uuid(conta.uuid);
+            transacoesDiarias.stream().forEach(transacao -> transacoes.add(transacao));
+        }catch (NullPointerException e){
         }
+        return transacoes;
     }
-
     private void deposito(BigDecimal valorDaTransacao){
         if (valorDaTransacao.compareTo(BigDecimal.ZERO) == -1 || valorDaTransacao.compareTo(BigDecimal.ZERO) == 0 ){
             notification.addError("Valor de depósito não pode ser menor ou igual a 0.");
@@ -79,14 +84,17 @@ public class TransacaoServiceImpl implements TransacaoService {
             conta.setSaldo(conta.saldo.add(valorDaTransacao));
         }
     }
-
+    private void saque(BigDecimal valorDaTransacao) {
+        if (saquePermitido(conta.saldo, valorDaTransacao)) {
+            conta.setSaldo(conta.saldo.subtract(valorDaTransacao));
+        }
+    }
     private boolean saquePermitido(BigDecimal contaSaldo, BigDecimal valorDaTransacao){
         if (saldoInsuficiente(contaSaldo, valorDaTransacao) || limiteDiarioDeSaqueExtrapolado(valorDaTransacao)){
             return false;
         }
         return true;
     }
-
     private boolean saldoInsuficiente(BigDecimal contaSaldo, BigDecimal valorDaTransacao){
         if (valorDaTransacao.compareTo(contaSaldo) == 1){
             notification.addError("Saldo insuficiente.");
@@ -94,7 +102,6 @@ public class TransacaoServiceImpl implements TransacaoService {
         }
         return false;
     }
-
     private boolean limiteDiarioDeSaqueExtrapolado(BigDecimal valorDaTransacao) {
         List<Transacao> listaDeTransacoesEfetuadas = buscarTransacoesEfetuadas();
         List<Transacao> listaDeTransacoesDiarias;
@@ -125,15 +132,5 @@ public class TransacaoServiceImpl implements TransacaoService {
             }
         }
         return false;
-    }
-
-    private List<Transacao> buscarTransacoesEfetuadas(){
-        List<Transacao> transacoes = new ArrayList<>();
-        try{
-            var transacoesDiarias = transacaoRepository.findByConta_Uuid(conta.uuid);
-            transacoesDiarias.stream().forEach(transacao -> transacoes.add(transacao));
-        }catch (NullPointerException e){
-        }
-        return transacoes;
     }
 }
