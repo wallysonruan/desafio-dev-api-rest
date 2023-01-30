@@ -24,6 +24,7 @@ public class TransacaoServiceImpl implements TransacaoService {
     private Notification notification;
     private Conta conta = new Conta();
     private final BigDecimal LIMITE_DIARIO_SAQUE = BigDecimal.valueOf(2000);
+
     public TransacaoServiceImpl(TransacaoRepository transacaoRepository, ContaRepository contaRepository, Notification notification) {
         this.transacaoRepository = transacaoRepository;
         this.contaRepository = contaRepository;
