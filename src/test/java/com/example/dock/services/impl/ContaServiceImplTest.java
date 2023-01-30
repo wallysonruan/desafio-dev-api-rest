@@ -36,6 +36,7 @@ public class ContaServiceImplTest {
 
     private final UUID UUID_DEFAULT = UUID.randomUUID();
     private final Portador PORTADOR = Portador.builder()
+            .uuid(UUID.randomUUID())
             .cpf("18241327005")
             .build();
     private final BigDecimal SALDO = BigDecimal.valueOf(13.4);
@@ -67,12 +68,41 @@ public class ContaServiceImplTest {
     }
 
     @Test
-    void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorValida__deveriaBuscarPortadorAdicionarAContaSalvarNoBancoDeDadosERetornarEla(){
+    void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorValido__deveriaBuscarPortadorAdicionarAContaSalvarNoBancoDeDadosERetornarEla(){
         notification.setResultado(CONTA);
 
         var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
 
+        Assertions.assertFalse(retorno.hasErrors());
+        Assertions.assertNull(retorno.getErrors());
+        Assertions.assertNotNull(retorno.getResultado());
         Assertions.assertEquals(CONTA, retorno.getResultado());
+    }
+
+    @Test
+    void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorJaCadastrado__deveriaRetornarNotificationComErro(){
+        when(portadorRepository.existsById(CONTA.getPortador().getUuid())).thenReturn(true);
+
+        var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
+
+        verify(portadorRepository, times(1)).existsById(any());
+        Assertions.assertTrue(retorno.hasErrors());
+        Assertions.assertNotNull(retorno.getErrors());
+        Assertions.assertTrue(retorno.getErrors().contains("Portador já tem conta cadastrada."));
+        Assertions.assertNull(retorno.getResultado());
+    }
+
+    @Test
+    void criarConta_quandoReceberUmContaComandoCriarDtoComAgenciaNaoCadastrada__deveriaRetornarNotificationComErro(){
+        when(agenciaRepository.existsById(CONTA.getAgencia().getId())).thenReturn(false);
+
+        var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
+
+        verify(agenciaRepository, times(1)).existsById(any());
+        Assertions.assertTrue(retorno.hasErrors());
+        Assertions.assertNotNull(retorno.getErrors());
+        Assertions.assertTrue(retorno.getErrors().contains("Agência não cadastrada."));
+        Assertions.assertNull(retorno.getResultado());
     }
 
     @Test

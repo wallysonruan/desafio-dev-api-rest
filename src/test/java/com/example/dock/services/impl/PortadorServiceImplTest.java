@@ -87,7 +87,7 @@ public class PortadorServiceImplTest {
 
         verify(repository, never()).deleteById(UUID_DEFAULT);
         verify(repository, times(1)).existsById(UUID_DEFAULT);
-        Assertions.assertTrue(notification.getErrors().contains("Portador (a) não cadastrado (a)."));
         Assertions.assertTrue(notification.hasErrors());
+        Assertions.assertTrue(notification.getErrors().contains("Portador (a) não cadastrado (a)."));
     }
 }

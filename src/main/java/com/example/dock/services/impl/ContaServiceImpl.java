@@ -35,49 +35,41 @@ public class ContaServiceImpl implements ContaService {
     @Override
     public Notification criarConta(ContaComandoCriarDto contaComandoCriarDTO) {
 
-        validacoes(notification, contaComandoCriarDTO);
+        verificaSePortadorExiste(contaComandoCriarDTO.portador);
+        verificaSeAgenciaExiste(contaComandoCriarDTO.agencia);
 
-        if(notification.hasErrors()){
-            return notification;
+        if(this.notification.hasErrors()){
+            return this.notification;
         }
-        portador = portadorRepository.findById(contaComandoCriarDTO.portador).get();
-        conta.setPortador(portador);
+        this.portador = portadorRepository.findById(contaComandoCriarDTO.portador).get();
+        this.conta.setPortador(this.portador);
 
-        agencia = agenciaRepository.findById(contaComandoCriarDTO.agencia).get();
-        conta.setAgencia(agencia);
+        this.agencia = agenciaRepository.findById(contaComandoCriarDTO.agencia).get();
+        this.conta.setAgencia(this.agencia);
 
-        conta.setSaldo(contaComandoCriarDTO.saldo);
-        conta.setAtivada(true);
-        conta.setBloqueada(false);
-        conta = contaRepository.save(conta);
+        this.conta.setSaldo(contaComandoCriarDTO.saldo);
+        this.conta.setAtivada(true);
+        this.conta.setBloqueada(false);
+        this.conta = contaRepository.save(this.conta);
 
-        notification.setResultado(conta);
-        return notification;
+        this.notification.setResultado(this.conta);
+        return this.notification;
     }
 
     @Override
     public Notification getAll() {
-        notification.setResultado(contaRepository.findAll());
-        return notification;
+        this.notification.setResultado(contaRepository.findAll());
+        return this.notification;
     }
 
-    private Notification validacoes(Notification notification, ContaComandoCriarDto contaComandoCriarDTO){
-        verificaSePortadorExiste(notification, contaComandoCriarDTO.portador);
-        verificaSeAgenciaExiste(notification, contaComandoCriarDTO.agencia);
-        return notification;
-    }
-    private Notification verificaSePortadorExiste(Notification notification, UUID portadorUuid){
-        if(! portadorRepository.existsById(portadorUuid)){
-            notification.addError("Portador (a) não cadastrado (a).");
-            return notification;
+    private void verificaSePortadorExiste(UUID portadorUuid){
+        if(portadorRepository.existsById(portadorUuid)){
+            this.notification.addError("Portador já tem conta cadastrada.");
         }
-        return notification;
     }
-    private Notification verificaSeAgenciaExiste(Notification notification, Long agenciaId){
+    private void verificaSeAgenciaExiste(Long agenciaId){
         if(! agenciaRepository.existsById(agenciaId)){
-            notification.addError("Agência não cadastrada.");
-            return notification;
+            this.notification.addError("Agência não cadastrada.");
         }
-        return notification;
     }
 }
