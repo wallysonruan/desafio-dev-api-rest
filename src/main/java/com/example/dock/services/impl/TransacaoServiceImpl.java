@@ -69,8 +69,6 @@ public class TransacaoServiceImpl implements TransacaoService {
     private void saque(BigDecimal valorDaTransacao) {
         if (saquePermitido(conta.saldo, valorDaTransacao)) {
             conta.setSaldo(conta.saldo.subtract(valorDaTransacao));
-        }else{
-            notification.addError("Saldo insuficiente.");
         }
     }
 
@@ -83,12 +81,18 @@ public class TransacaoServiceImpl implements TransacaoService {
     }
 
     private boolean saquePermitido(BigDecimal contaSaldo, BigDecimal valorDaTransacao){
-        BigDecimal saldoFinal = contaSaldo.subtract(valorDaTransacao);
-
-        if (saldoFinal.compareTo(BigDecimal.ZERO) == -1 || limiteDiarioDeSaqueExtrapolado(valorDaTransacao)){
+        if (saldoInsuficiente(contaSaldo, valorDaTransacao) || limiteDiarioDeSaqueExtrapolado(valorDaTransacao)){
             return false;
         }
         return true;
+    }
+
+    private boolean saldoInsuficiente(BigDecimal contaSaldo, BigDecimal valorDaTransacao){
+        if (valorDaTransacao.compareTo(contaSaldo) == 1){
+            notification.addError("Saldo insuficiente.");
+            return true;
+        }
+        return false;
     }
 
     private boolean limiteDiarioDeSaqueExtrapolado(BigDecimal valorDaTransacao) {
