@@ -108,6 +108,8 @@ class TransacaoServiceImplTest {
         assertEquals(BigDecimal.valueOf(20.0), response.getResultado().getConta().getSaldo());
         assertTrue(response.getResultado().getConta().ativada);
         assertFalse(response.getResultado().getConta().bloqueada);
+        assertFalse(response.hasErrors());
+        assertTrue(response.getErrors().isEmpty());
     }
     @Test
     void novaTransacao_quandoTransacaoTipoDepositoComContaDesativada__deveriaRetornarNotificacaoComErro(){
@@ -160,6 +162,8 @@ class TransacaoServiceImplTest {
         assertEquals(BigDecimal.valueOf(0.0), response.getResultado().getConta().getSaldo());
         assertTrue(response.getResultado().getConta().ativada);
         assertFalse(response.getResultado().getConta().bloqueada);
+        assertFalse(response.hasErrors());
+        assertTrue(response.getErrors().isEmpty());
     }
     @Test
     void novaTransacao_quandoTransacaoTipoSaqueComContaDesativada__deveriaRetornarNotificacaoComErro(){
