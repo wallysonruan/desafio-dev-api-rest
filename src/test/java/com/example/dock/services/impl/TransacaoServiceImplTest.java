@@ -125,6 +125,20 @@ class TransacaoServiceImplTest {
         assertTrue(response.getErrors().contains("A conta está desativada."));
     }
     @Test
+    void novaTransacao_quandoTransacaoTipoDepositoComContaBloqueada__deveriaRetornarNotificacaoComErro(){
+        Conta contaDesativada = Conta.builder()
+                .ativada(true)
+                .bloqueada(true)
+                .build();
+
+        when(contaRepository.findById(any())).thenReturn(Optional.ofNullable(contaDesativada));
+
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_DEPOSITO);
+
+        assertTrue(response.hasErrors());
+        assertTrue(response.getErrors().contains("A conta está bloqueada."));
+    }
+    @Test
     void novaTransacao_quandoTransacaoTipoDepositoValorNegativo__deveriaRetornarNotificacaoComErro(){
         when(contaRepository.findById(TRANSACAO.getConta().getUuid())).thenReturn(Optional.ofNullable(TRANSACAO.getConta()));
 
@@ -177,6 +191,20 @@ class TransacaoServiceImplTest {
 
         assertTrue(response.hasErrors());
         assertTrue(response.getErrors().contains("A conta está desativada."));
+    }
+    @Test
+    void novaTransacao_quandoTransacaoTipoSaqueComContaBloqueada__deveriaRetornarNotificacaoComErro(){
+        Conta contaDesativada = Conta.builder()
+                .ativada(true)
+                .bloqueada(true)
+                .build();
+
+        when(contaRepository.findById(any())).thenReturn(Optional.ofNullable(contaDesativada));
+
+        var response = service.novaTransacao(TRANSACAO_COMANDO_CRIAR_DTO_SAQUE);
+
+        assertTrue(response.hasErrors());
+        assertTrue(response.getErrors().contains("A conta está bloqueada."));
     }
     @Test
     void novaTransacao_quandoTransacaoTipoSaqueComValorMaiorAoSaldo__deveriaRetornarNotificationComErro(){

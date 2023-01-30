@@ -37,7 +37,11 @@ public class TransacaoServiceImpl implements TransacaoService {
         try{
             buscarConta(transacaoComandoCriarDto.contaUuid);
             if (conta.ativada){
-                atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
+                if (! conta.bloqueada){
+                    atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
+                }else{
+                    notification.addError("A conta está bloqueada.");
+                }
             }else{
                 notification.addError("A conta está desativada.");
             }
