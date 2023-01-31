@@ -81,6 +81,7 @@ public class ContaServiceImplTest {
 
     @Test
     void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorJaCadastrado__deveriaRetornarNotificationComErro(){
+        when(agenciaRepository.existsById(CONTA.getAgencia().id)).thenReturn(true);
         when(portadorRepository.existsById(CONTA.getPortador().getUuid())).thenReturn(true);
 
         var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);

@@ -39,39 +39,37 @@ public class ContaServiceImpl implements ContaService {
         verificaSePortadorExiste(contaComandoCriarDTO.portador);
         verificaSeAgenciaExiste(contaComandoCriarDTO.agencia);
 
-        if(this.notification.hasErrors()){
-            return this.notification;
+        if(notification.hasErrors()){
+            return notification;
         }
-        this.portador = portadorRepository.findById(contaComandoCriarDTO.portador).get();
-        this.conta.setPortador(this.portador);
+        portador = portadorRepository.findById(contaComandoCriarDTO.portador).get();
+        conta.setPortador(portador);
 
-        this.agencia = agenciaRepository.findById(contaComandoCriarDTO.agencia).get();
-        this.conta.setAgencia(this.agencia);
+        agencia = agenciaRepository.findById(contaComandoCriarDTO.agencia).get();
+        conta.setAgencia(agencia);
 
-        this.conta.setSaldo(contaComandoCriarDTO.saldo);
-        this.conta.setAtivada(true);
-        this.conta.setBloqueada(false);
-        this.conta = contaRepository.save(this.conta);
+        conta.setSaldo(contaComandoCriarDTO.saldo);
+        conta.setAtivada(true);
+        conta.setBloqueada(false);
+        conta = contaRepository.save(conta);
 
-        this.notification.setResultado(this.conta);
-        return this.notification;
+        notification.setResultado(conta);
+        return notification;
     }
 
     @Override
     public Notification getAll() {
-        this.notification.setResultado(contaRepository.findAll());
-        return this.notification;
+        notification.setResultado(contaRepository.findAll());
+        return notification;
     }
 
     private void verificaSePortadorExiste(UUID portadorUuid){
         if(portadorRepository.existsById(portadorUuid)){
-            this.notification.addError("Portador já tem conta cadastrada.");
             notification.addError("Portador já tem conta cadastrada.");
         }
     }
     private void verificaSeAgenciaExiste(Long agenciaId){
         if(! agenciaRepository.existsById(agenciaId)){
-            this.notification.addError("Agência não cadastrada.");
             notification.addError("Agência não cadastrada.");
         }
     }
