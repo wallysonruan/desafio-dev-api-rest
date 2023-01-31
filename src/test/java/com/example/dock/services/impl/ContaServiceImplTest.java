@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -69,13 +70,17 @@ public class ContaServiceImplTest {
 
     @Test
     void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorValido__deveriaBuscarPortadorAdicionarAContaSalvarNoBancoDeDadosERetornarEla(){
-        notification.setResultado(CONTA);
+        when(agenciaRepository.existsById(CONTA.getAgencia().id)).thenReturn(true);
+        when(portadorRepository.existsById(CONTA.getPortador().getUuid())).thenReturn(false);
+
+        when(portadorRepository.findById(any())).thenReturn(Optional.of(CONTA.getPortador()));
+        when(agenciaRepository.findById(any())).thenReturn(Optional.of(CONTA.getAgencia()));
+        when(contaRepository.save(any())).thenReturn(CONTA);
 
         var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
 
         Assertions.assertFalse(retorno.hasErrors());
-        Assertions.assertNull(retorno.getErrors());
-        Assertions.assertNotNull(retorno.getResultado());
+        Assertions.assertTrue(retorno.getErrors().isEmpty());
         Assertions.assertEquals(CONTA, retorno.getResultado());
     }
 
