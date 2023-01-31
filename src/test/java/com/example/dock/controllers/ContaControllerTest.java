@@ -22,7 +22,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -55,7 +56,7 @@ class ContaControllerTest {
     private final Boolean ATIVADA = true;
     private final Boolean BLOQUEADA = false;
 
-    private Conta CONTA = Conta.builder()
+    private final Conta CONTA = Conta.builder()
             .uuid(UUID_DEFAULT)
             .portador(PORTADOR)
             .agencia(AGENCIA)
@@ -63,13 +64,13 @@ class ContaControllerTest {
             .ativada(ATIVADA)
             .bloqueada(BLOQUEADA)
             .build();
-    private ContaComandoCriarDto CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDto.builder()
+    private final ContaComandoCriarDto CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDto.builder()
             .portador(CONTA.getPortador().getUuid())
             .saldo(SALDO)
             .agencia(CONTA.getAgencia().getId())
             .build();
 
-    private ContaRespostaDto CONTA_RESPOSTA_DTO = com.example.dock.controllers.dtos.ContaRespostaDto.builder()
+    private final ContaRespostaDto CONTA_RESPOSTA_DTO = com.example.dock.controllers.dtos.ContaRespostaDto.builder()
             .uuid(UUID_DEFAULT)
             .portador(PORTADOR)
             .agencia(AGENCIA)
@@ -93,7 +94,7 @@ class ContaControllerTest {
     }
 
     @Test
-    void criarConta_quandoReceberContaComandoCriarDtoVálido__retornarHttp200() throws Exception {
+    void criarConta_quandoReceberContaComandoCriarDtoValido__retornarHttp200() throws Exception {
         notification.setResultado(CONTA);
         when(service.criarConta(any())).thenReturn(notification);
         String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);
@@ -106,7 +107,7 @@ class ContaControllerTest {
     }
 
     @Test
-    void criarConta_quandoReceberContaComandoCriarDtoVálido_retornarHttp200JuntoComContaCriada() throws Exception {
+    void criarConta_quandoReceberContaComandoCriarDtoValido_retornarHttp200JuntoComContaCriada() throws Exception {
         notification.setResultado(CONTA);
         when(service.criarConta(any())).thenReturn(notification);
         when(mapper.contaToContaRespostaDto(CONTA)).thenReturn(CONTA_RESPOSTA_DTO);
@@ -131,7 +132,7 @@ class ContaControllerTest {
     }
 
     @Test
-    void criarConta_quandoNãoReceberContaComandoCriarDto__retornarHttp400() throws Exception{
+    void criarConta_quandoNaoReceberContaComandoCriarDto__retornarHttp400() throws Exception{
         mockMvc.perform(
                 post(URL)
         ).andExpect(status().isBadRequest());
