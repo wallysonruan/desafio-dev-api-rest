@@ -23,8 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -98,6 +97,24 @@ class TransacaoControllerTest {
         assertEquals(TRANSACAO_RESPOSTA_DTO.totalDaTransacao, responseAsObject.totalDaTransacao);
         assertEquals(TRANSACAO_RESPOSTA_DTO.transacaoTipo, responseAsObject.transacaoTipo);
         assertEquals(TRANSACAO_RESPOSTA_DTO.conta, responseAsObject.conta);
+    }
+
+    @Test
+    void novaTransacao__quandoReceberContaInexistente__deveriaRetornarHttps403ENotificationComErro() throws Exception {
+        String mensagemDeErro = "Conta não encontrada.";
+        notification.addError(mensagemDeErro);
+        when(service.novaTransacao(any())).thenReturn(notification);
+        String TRANSACAO_COMANDO_CRIAR_DTO_JSON = objectMapper.writeValueAsString(TRANSACAO_COMANDO_CRIAR_DTO);
+
+        var response = mockMvc.perform(
+                        post(URL)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(TRANSACAO_COMANDO_CRIAR_DTO_JSON)
+                ).andExpect(status().isForbidden())
+                .andReturn().getResponse();
+
+        verify(service, times(1)).novaTransacao(any());
+        assertTrue(response.getContentAsString().contains(mensagemDeErro));
     }
 
     @Test

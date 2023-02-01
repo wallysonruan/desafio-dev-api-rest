@@ -85,6 +85,23 @@ class PortadorControllerTest {
     }
 
     @Test
+    void criarPortador_quandoReceberCpfJaCadastrado__deveriaRetornarNotificacaoComErroEHttp203() throws Exception{
+        notification.addError("CPF já cadastrado.");
+
+        when(service.criarPortador(PORTADOR_COMANDO_CRIAR)).thenReturn(notification);
+        String portador_comando_criar_as_json = objectMapper.writeValueAsString(PORTADOR_COMANDO_CRIAR);
+
+        var response = mvc.perform(
+                        post(URL_DEFAULT)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(portador_comando_criar_as_json)
+                ).andExpect(status().isForbidden())
+                .andReturn().getResponse();
+
+        Assertions.assertTrue(response.getContentAsString().contains("CPF já cadastrado."));
+    }
+
+    @Test
     void deletarPortador_quandoReceberUuidDePortadorRegistrado__ApagarERetornar204() throws Exception{
         when(service.deletarPortador(UUID_DEFAULT)).thenReturn(notification);
 
