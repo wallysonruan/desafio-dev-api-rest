@@ -9,6 +9,7 @@ import com.example.dock.models.Portador;
 import com.example.dock.services.ContaService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,19 +95,6 @@ class ContaControllerTest {
     }
 
     @Test
-    void criarConta_quandoReceberContaComandoCriarDtoValido__retornarHttp200() throws Exception {
-        notification.setResultado(CONTA);
-        when(service.criarConta(any())).thenReturn(notification);
-        String contaComandoCriarAsJSON = objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO);
-
-        mockMvc.perform(
-                post(URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(contaComandoCriarAsJSON)
-        ).andExpect(status().isOk());
-    }
-
-    @Test
     void criarConta_quandoReceberContaComandoCriarDtoValido_retornarHttp200JuntoComContaCriada() throws Exception {
         notification.setResultado(CONTA);
         when(service.criarConta(any())).thenReturn(notification);
@@ -136,6 +124,22 @@ class ContaControllerTest {
         mockMvc.perform(
                 post(URL)
         ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void criarConta_quandoContaComandoCriarDtoPortadorExistente__retornarHttp403ENotificationComErro() throws Exception{
+        String mensagemErro = "Portador já tem conta cadastrada.";
+        notification.addError(mensagemErro);
+        when(service.criarConta(any())).thenReturn(notification);
+
+        var response = mockMvc.perform(
+                post(URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(CONTA_COMANDO_CRIAR_DTO))
+        ).andExpect(status().isForbidden())
+                .andReturn().getResponse();
+
+        Assertions.assertTrue(response.getContentAsString().contains(mensagemErro));
     }
 
     @Test
