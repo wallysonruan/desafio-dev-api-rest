@@ -54,8 +54,10 @@ jacocoTestReport {
 	afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
-					"com/example/dock/controllers/dtos/*Dto*.*",
-					"com/example/dock/controllers/*Mapper*.*"
+					"com/example/dock/models/*",
+					"com/example/dock/controllers/dtos/",
+					"com/example/dock/controllers/*Mapper*.*",
+					"com/example/**/*Builder*.*",
 			])
 		}))
 	}
