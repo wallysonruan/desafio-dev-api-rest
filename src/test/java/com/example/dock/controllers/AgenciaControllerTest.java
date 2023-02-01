@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -79,12 +80,27 @@ public class AgenciaControllerTest {
     }
 
     @Test
-    void criarAgencia_quandoReceberUmAgenciaComandoCriarInvalido__retornar404() throws Exception{
+    void criarAgencia_quandoReceberUmAgenciaComandoCriarVazio__retornar404() throws Exception{
         var response = mvc.perform(
                         post(URL_DEFAULT)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("")
                 ).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void criarAgencia_quandoReceberNomeDeAgenciaJaCadastrado__retornar403ENotificationComErro() throws Exception{
+        notification.addError("Agencia já cadastrada.");
+        when(service.criarAgencia(any())).thenReturn(notification);
+
+        var response = mvc.perform(
+                post(URL_DEFAULT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(AGENCIA_COMANDO_CRIAR_DTO))
+        ).andExpect(status().isForbidden())
+                .andReturn().getResponse();
+
+        assertTrue(response.getContentAsString().contains("Agencia já cadastrada."));
     }
 
     @Test
