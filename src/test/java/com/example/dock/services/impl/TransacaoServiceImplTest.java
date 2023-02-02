@@ -16,12 +16,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -266,4 +268,20 @@ class TransacaoServiceImplTest {
         assertTrue(response.hasErrors());
         assertTrue(response.getErrors().contains("Saque não permitido, pois ultrapassaria o limite diário."));
     }
+
+    @Test
+    void getTransactionsByDate_quandoReceberUuidDeContaCadastradaEDatasValidas__deveriaRetornarNotificacaoComListaDeTransacoes(){
+        var listOfTransacao = List.of(TRANSACAO);
+        when(contaRepository.findById(any())).thenReturn(Optional.of(TRANSACAO.getConta()));
+        when(transacaoRepository.findByConta_Uuid(any())).thenReturn(listOfTransacao);
+
+        var response = service.getTransactionsByDate(TRANSACAO.getConta().uuid, LocalDate.now(), LocalDate.now().plusDays(1));
+
+        assertFalse(response.hasErrors());
+        assertEquals(listOfTransacao.get(0).uuid, response.getResultado().get(0).uuid);
+        assertEquals(listOfTransacao.get(0).transacaoTipo, response.getResultado().get(0).transacaoTipo);
+        assertEquals(listOfTransacao.get(0).totalDaTransacao, response.getResultado().get(0).totalDaTransacao);
+        assertEquals(listOfTransacao.get(0).dateTime, response.getResultado().get(0).dateTime);
+        assertEquals(listOfTransacao.get(0).saldo, response.getResultado().get(0).saldo);
+    };
 }

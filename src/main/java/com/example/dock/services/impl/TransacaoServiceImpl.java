@@ -62,9 +62,38 @@ public class TransacaoServiceImpl implements TransacaoService {
 
         return notification;
     }
+
+    @Override
+    public Notification<List<Transacao>> getTransactionsByDate(UUID contaUuid, LocalDate initialDate, LocalDate finalDate) {
+        notification = new Notification();
+        buscarConta(contaUuid);
+
+        if (notification.hasErrors()){
+            return notification;
+        }
+
+        var todasAsTransacoesDaConta = buscarTransacoesEfetuadas();
+        var todasAsTransacoesEntreOPeriodo = todasAsTransacoesDaConta.stream().filter(
+                transacao -> verificarSeEstaEntreDuasDatas(transacao.getDateTime().toLocalDate(), initialDate, finalDate)).collect(Collectors.toList());
+
+        notification.setResultado(todasAsTransacoesEntreOPeriodo);
+        return notification;
+    }
+
+    private boolean verificarSeEstaEntreDuasDatas(LocalDate dateToCheck, LocalDate initialDate, LocalDate finalDate){
+        if (dateToCheck.isEqual(initialDate) || dateToCheck.isAfter(initialDate) || dateToCheck.isEqual(finalDate) || dateToCheck.isBefore(finalDate)){
+            return true;
+        }
+        return false;
+    }
+
     private void buscarConta(UUID contaUuid){
-        Optional<Conta> conta = contaRepository.findById(contaUuid);
-        this.conta = conta.get();
+        try{
+            Optional<Conta> conta = contaRepository.findById(contaUuid);
+            this.conta = conta.get();
+        }catch (NoSuchElementException e){
+            notification.addError("Esta conta não existe.");
+        }
     }
     private void atualizarSaldoDaConta(TransacaoTipo transacaoTipo, BigDecimal valorDaTransacao) {
         if (transacaoTipo == TransacaoTipo.SAQUE){

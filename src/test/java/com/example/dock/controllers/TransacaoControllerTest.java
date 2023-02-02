@@ -3,11 +3,12 @@ package com.example.dock.controllers;
 import com.example.dock.Notification;
 import com.example.dock.controllers.dtos.TransacaoComandoCriarDto;
 import com.example.dock.controllers.dtos.TransacaoRespostaDto;
+import com.example.dock.controllers.dtos.TransacaoRespostaPorPeriodoDto;
 import com.example.dock.models.Conta;
-import com.example.dock.models.Portador;
 import com.example.dock.models.Transacao;
 import com.example.dock.models.TransacaoTipo;
 import com.example.dock.services.impl.TransacaoServiceImpl;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,11 +21,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.UUID;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -67,6 +72,14 @@ class TransacaoControllerTest {
             .dateTime(TRANSACAO.getDateTime())
             .transacaoTipo(TRANSACAO.getTransacaoTipo())
             .totalDaTransacao(TRANSACAO.getTotalDaTransacao())
+            .build();
+
+    private final TransacaoRespostaPorPeriodoDto TRANSACAO_RESPOSTA_POR_PERIODO = TransacaoRespostaPorPeriodoDto.builder()
+            .uuid(TRANSACAO.getUuid())
+            .dateTime(TRANSACAO.getDateTime())
+            .transacaoTipo(TRANSACAO.getTransacaoTipo())
+            .totalDaTransacao(TRANSACAO.getTotalDaTransacao())
+            .saldo(TRANSACAO.getSaldo())
             .build();
 
     @BeforeEach
@@ -132,5 +145,28 @@ class TransacaoControllerTest {
                 ).andExpect(status().isBadRequest());
 
         verify(service, times(0)).novaTransacao(any());
+    }
+
+    @Test
+    void getTransacoesPorContaEPeriodo_quandoReceberContaCadastradaEDataDeInicioEFimValidas__deveriaRetornarTodasAsTransacoes() throws Exception{
+        LocalDate initialDate = LocalDate.now();
+        LocalDate finalDate = LocalDate.now().plusDays(1L);
+        var listOfTransacaoRespostaPorPeriodo = List.of(TRANSACAO_RESPOSTA_POR_PERIODO);
+        notification.setResultado(listOfTransacaoRespostaPorPeriodo);
+
+        when(service.getTransactionsByDate(TRANSACAO.getConta().uuid, initialDate, finalDate)).thenReturn(notification);
+        when(transacaoMapper.transacaoToTransacaoRespostaPorPeriodoDto(any())).thenReturn(listOfTransacaoRespostaPorPeriodo);
+
+        var response = mockMvc.perform(
+                get(URL + "/" + TRANSACAO.getConta().uuid + "?" + "initial-date=" + initialDate + "&final-date=" + finalDate)
+        ).andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        var responseAsTransacaoRespostaPorPeriodo = objectMapper.readValue(response.getContentAsString(), new TypeReference<ArrayList<TransacaoRespostaPorPeriodoDto>>() {});
+        assertEquals(listOfTransacaoRespostaPorPeriodo.get(0).uuid, responseAsTransacaoRespostaPorPeriodo.get(0).uuid);
+        assertEquals(listOfTransacaoRespostaPorPeriodo.get(0).transacaoTipo, responseAsTransacaoRespostaPorPeriodo.get(0).transacaoTipo);
+        assertEquals(listOfTransacaoRespostaPorPeriodo.get(0).totalDaTransacao, responseAsTransacaoRespostaPorPeriodo.get(0).totalDaTransacao);
+        assertEquals(listOfTransacaoRespostaPorPeriodo.get(0).dateTime, responseAsTransacaoRespostaPorPeriodo.get(0).dateTime);
+        assertEquals(listOfTransacaoRespostaPorPeriodo.get(0).saldo, responseAsTransacaoRespostaPorPeriodo.get(0).saldo);
     }
 }
