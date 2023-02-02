@@ -71,7 +71,7 @@ public class ContaServiceImplTest {
     @Test
     void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorValido__deveriaBuscarPortadorAdicionarAContaSalvarNoBancoDeDadosERetornarEla(){
         when(agenciaRepository.existsById(CONTA.getAgencia().id)).thenReturn(true);
-        when(portadorRepository.existsById(CONTA.getPortador().getUuid())).thenReturn(false);
+        when(portadorRepository.existsById(CONTA.getPortador().getUuid())).thenReturn(true);
 
         when(portadorRepository.findById(any())).thenReturn(Optional.of(CONTA.getPortador()));
         when(agenciaRepository.findById(any())).thenReturn(Optional.of(CONTA.getAgencia()));
@@ -87,14 +87,28 @@ public class ContaServiceImplTest {
     @Test
     void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorJaCadastrado__deveriaRetornarNotificationComErro(){
         when(agenciaRepository.existsById(CONTA.getAgencia().id)).thenReturn(true);
-        when(portadorRepository.existsById(CONTA.getPortador().getUuid())).thenReturn(true);
+        when(contaRepository.existsByPortador_Uuid(CONTA.getPortador().getUuid())).thenReturn(true);
+
+        var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
+
+        verify(portadorRepository, times(1)).existsById(any());
+        Assertions.assertTrue(retorno.hasErrors());
+        Assertions.assertTrue(retorno.getErrors().isEmpty());
+        Assertions.assertTrue(retorno.getErrors().contains("Portador já tem conta cadastrada."));
+        Assertions.assertNull(retorno.getResultado());
+    }
+
+    @Test
+    void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorNaoCadastrado__deveriaRetornarNotificationComErro(){
+        when(agenciaRepository.existsById(CONTA.getAgencia().id)).thenReturn(true);
+        when(portadorRepository.existsById(CONTA.getPortador().getUuid())).thenReturn(false);
 
         var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
 
         verify(portadorRepository, times(1)).existsById(any());
         Assertions.assertTrue(retorno.hasErrors());
         Assertions.assertNotNull(retorno.getErrors());
-        Assertions.assertTrue(retorno.getErrors().contains("Portador já tem conta cadastrada."));
+        Assertions.assertTrue(retorno.getErrors().contains("Portador não cadastrado."));
         Assertions.assertNull(retorno.getResultado());
     }
 
