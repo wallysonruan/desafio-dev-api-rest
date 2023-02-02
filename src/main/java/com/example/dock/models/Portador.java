@@ -1,5 +1,6 @@
 package com.example.dock.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.validator.constraints.br.CPF;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Portador {
 
     @Id

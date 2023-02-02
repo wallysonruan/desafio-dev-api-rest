@@ -15,9 +15,11 @@ import javax.validation.Valid;
 @RequestMapping("transacao")
 public class TransacaoController {
     private final TransacaoService service;
+    private final TransacaoMapper transacaoMapper;
 
-    TransacaoController(TransacaoService service){
+    TransacaoController(TransacaoService service, TransacaoMapperImpl transacaoMapper){
         this.service = service;
+        this.transacaoMapper = transacaoMapper;
     }
 
 
@@ -29,7 +31,7 @@ public class TransacaoController {
             return new ResponseEntity<>(notification.getErrors(), HttpStatus.FORBIDDEN);
         }
 
-        return new ResponseEntity<>(notification.getResultado(), HttpStatus.CREATED);
+        return new ResponseEntity<>( transacaoMapper.transacaoToTransacaoDto(notification.getResultado()), HttpStatus.CREATED);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.dock.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,24 +17,19 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Conta {
-
     @Id
     @GeneratedValue(generator = "uuid")
     public UUID uuid;
-
     @NaturalId
     @OneToOne
     @JoinColumn(name = "portador_id", referencedColumnName = "uuid")
     public Portador portador;
-
     public BigDecimal saldo;
-
     @ManyToOne
     @JoinColumn(name = "agencia_id", referencedColumnName = "id")
     public Agencia agencia;
-
     public Boolean ativada;
-
     public Boolean bloqueada;
 }

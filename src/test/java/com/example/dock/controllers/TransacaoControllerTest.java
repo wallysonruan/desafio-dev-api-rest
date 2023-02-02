@@ -38,6 +38,8 @@ class TransacaoControllerTest {
 
     @Mock
     TransacaoServiceImpl service;
+    @Mock
+    TransacaoMapperImpl transacaoMapper;
 
     private final String URL = "/transacao";
 
@@ -69,7 +71,7 @@ class TransacaoControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new TransacaoController(service);
+        controller = new TransacaoController(service, transacaoMapper);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -80,6 +82,7 @@ class TransacaoControllerTest {
     void novaTransacao__quandoReceberTransacaoComandoCriarDtoValido__deveriaRetornarTransacaoRespostaDtoE200() throws Exception {
         notification.setResultado(TRANSACAO);
         when(service.novaTransacao(any())).thenReturn(notification);
+        when(transacaoMapper.transacaoToTransacaoDto(TRANSACAO)).thenReturn(TRANSACAO_RESPOSTA_DTO);
         String TRANSACAO_COMANDO_CRIAR_DTO_JSON = objectMapper.writeValueAsString(TRANSACAO_COMANDO_CRIAR_DTO);
 
         var response = mockMvc.perform(
