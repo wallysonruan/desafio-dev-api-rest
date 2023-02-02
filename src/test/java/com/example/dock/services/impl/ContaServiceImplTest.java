@@ -93,7 +93,7 @@ public class ContaServiceImplTest {
 
         verify(portadorRepository, times(1)).existsById(any());
         Assertions.assertTrue(retorno.hasErrors());
-        Assertions.assertTrue(retorno.getErrors().isEmpty());
+        Assertions.assertFalse(retorno.getErrors().isEmpty());
         Assertions.assertTrue(retorno.getErrors().contains("Portador já tem conta cadastrada."));
         Assertions.assertNull(retorno.getResultado());
     }
