@@ -81,12 +81,11 @@ public class TransacaoServiceImpl implements TransacaoService {
     }
 
     private boolean verificarSeEstaEntreDuasDatas(LocalDate dateToCheck, LocalDate initialDate, LocalDate finalDate){
-        if (dateToCheck.isEqual(initialDate) || dateToCheck.isAfter(initialDate) || dateToCheck.isEqual(finalDate) || dateToCheck.isBefore(finalDate)){
+        if (dateToCheck.compareTo(initialDate) >= 0 && dateToCheck.compareTo(finalDate) <= 0){
             return true;
         }
         return false;
     }
-
     private void buscarConta(UUID contaUuid){
         try{
             Optional<Conta> conta = contaRepository.findById(contaUuid);
