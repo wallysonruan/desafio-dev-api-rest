@@ -169,4 +169,26 @@ class TransacaoControllerTest {
         assertEquals(listOfTransacaoRespostaPorPeriodo.get(0).dateTime, responseAsTransacaoRespostaPorPeriodo.get(0).dateTime);
         assertEquals(listOfTransacaoRespostaPorPeriodo.get(0).saldo, responseAsTransacaoRespostaPorPeriodo.get(0).saldo);
     }
+    @Test
+    void getTransacoesPorContaEPeriodo_quandoReceberContaCadastradaEDataDeInicioEFimInvalidas__deveriaRetornarErro403EMensagemDeErro() throws Exception{
+        String initialDate = "2023-a-02";
+        String finalDate = "2023-01-02";
+        var response = mockMvc.perform(
+                        get(URL + "/" + TRANSACAO.getConta().uuid + "?" + "initial-date=" + initialDate + "&final-date=" + finalDate)
+                ).andExpect(status().isBadRequest())
+                .andReturn().getResponse();
+
+        assertTrue(response.getContentAsString().contains("Data (s) inválida (s)! As datas devem seguir o formato: YYYY-MM-DD."));
+    }
+    @Test
+    void getTransacoesPorContaEPeriodo_quandoReceberContaCadastradaEDataDeInicioEFimVazias__deveriaRetornarErro403EMensagemDeErro() throws Exception{
+        String initialDate = "";
+        String finalDate = "";
+        var response = mockMvc.perform(
+                        get(URL + "/" + TRANSACAO.getConta().uuid + "?" + "initial-date=" + initialDate + "&final-date=" + finalDate)
+                ).andExpect(status().isBadRequest())
+                .andReturn().getResponse();
+
+        assertTrue(response.getContentAsString().contains("Data (s) inválida (s)! As datas devem seguir o formato: YYYY-MM-DD."));
+    }
 }

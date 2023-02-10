@@ -48,7 +48,7 @@ public class TransacaoController {
             finalDateStringToLocalDate = LocalDate.parse(finalDate);
         }catch (DateTimeParseException exception){
             notification.addError("Data (s) inválida (s)! As datas devem seguir o formato: YYYY-MM-DD.");
-            return new ResponseEntity<>(notification.getErrors(), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(notification.getErrors(), HttpStatus.BAD_REQUEST);
         }
 
         notification = service.getTransactionsByDate(uuid, LocalDate.parse(initialDate), LocalDate.parse(finalDate));
