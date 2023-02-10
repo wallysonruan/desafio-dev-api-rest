@@ -155,7 +155,7 @@ class TransacaoControllerTest {
         notification.setResultado(listOfTransacaoRespostaPorPeriodo);
 
         when(service.getTransactionsByDate(TRANSACAO.getConta().uuid, initialDate, finalDate)).thenReturn(notification);
-        when(transacaoMapper.transacaoToTransacaoRespostaPorPeriodoDto(any())).thenReturn(listOfTransacaoRespostaPorPeriodo);
+        when(transacaoMapper.listTransacaoToListTransacaoRespostaPorPeriodoDto(any())).thenReturn(listOfTransacaoRespostaPorPeriodo);
 
         var response = mockMvc.perform(
                 get(URL + "/" + TRANSACAO.getConta().uuid + "?" + "initial-date=" + initialDate + "&final-date=" + finalDate)

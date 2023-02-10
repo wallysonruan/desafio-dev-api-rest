@@ -13,5 +13,5 @@ public interface TransacaoMapper {
     @Mapping(target = "conta.portador", ignore = true)
     @Mapping(target = "conta.agencia.nome", ignore = true)
     TransacaoRespostaDto transacaoToTransacaoDto(Transacao transacao);
-    List<TransacaoRespostaPorPeriodoDto> transacaoToTransacaoRespostaPorPeriodoDto(List<Transacao> transacao);
+    List<TransacaoRespostaPorPeriodoDto> listTransacaoToListTransacaoRespostaPorPeriodoDto(List<Transacao> transacao);
 }

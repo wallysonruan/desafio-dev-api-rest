@@ -284,4 +284,8 @@ class TransacaoServiceImplTest {
         assertEquals(listOfTransacao.get(0).dateTime, response.getResultado().get(0).dateTime);
         assertEquals(listOfTransacao.get(0).saldo, response.getResultado().get(0).saldo);
     };
+//
+//    @Test
+//    void getTransactionsByDate_quandoReceberDatasInvalidas__deveriaRetornarNotificationComErro(){
+//    }
 }
