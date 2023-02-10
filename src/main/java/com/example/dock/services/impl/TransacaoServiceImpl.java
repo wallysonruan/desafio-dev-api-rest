@@ -34,8 +34,11 @@ public class TransacaoServiceImpl implements TransacaoService {
     public Notification<Transacao> novaTransacao(TransacaoComandoCriarDto transacaoComandoCriarDto) {
         notification = new Notification<Transacao>();
 
-        try{
-            buscarConta(transacaoComandoCriarDto.contaUuid);
+        buscarConta(transacaoComandoCriarDto.contaUuid);
+
+        if (notification.hasErrors()){
+            return notification;
+        }else {
             if (conta.ativada){
                 if (! conta.bloqueada){
                     atualizarSaldoDaConta(transacaoComandoCriarDto.transacaoTipo, transacaoComandoCriarDto.totalDaTransacao);
@@ -45,9 +48,6 @@ public class TransacaoServiceImpl implements TransacaoService {
             }else{
                 notification.addError("A conta está desativada.");
             }
-        }catch (NoSuchElementException e){
-            notification.addError("Conta não encontrada.");
-            return notification;
         }
 
         Transacao transacao = new Transacao();
@@ -87,11 +87,11 @@ public class TransacaoServiceImpl implements TransacaoService {
         return false;
     }
     private void buscarConta(UUID contaUuid){
-        try{
-            Optional<Conta> conta = contaRepository.findById(contaUuid);
+        Optional<Conta> conta = contaRepository.findById(contaUuid);
+        if (conta.isEmpty()){
+            notification.addError("Conta não encontrada.");
+        }else {
             this.conta = conta.get();
-        }catch (NoSuchElementException e){
-            notification.addError("Esta conta não existe.");
         }
     }
     private void atualizarSaldoDaConta(TransacaoTipo transacaoTipo, BigDecimal valorDaTransacao) {
