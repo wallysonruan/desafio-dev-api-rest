@@ -270,22 +270,48 @@ class TransacaoServiceImplTest {
     }
 
     @Test
-    void getTransactionsByDate_quandoReceberUuidDeContaCadastradaEDatasValidas__deveriaRetornarNotificacaoComListaDeTransacoes(){
-        var listOfTransacao = List.of(TRANSACAO);
+    void getTransactionsByDate_deveriaRetornarNotificacaoComListaDeTransacoes(){
+        Transacao transacaoDataDentroDoPeriodoEscolhido = Transacao.builder()
+                .uuid(UUID.randomUUID())
+                .conta(Conta.builder()
+                        .uuid(UUID.randomUUID())
+                        .portador(Portador.builder().build())
+                        .bloqueada(false)
+                        .ativada(true)
+                        .saldo(BigDecimal.valueOf(10))
+                        .build())
+                .transacaoTipo(TransacaoTipo.DEPOSITO)
+                .dateTime(LocalDateTime.now())
+                .totalDaTransacao(BigDecimal.valueOf(10.0))
+                .build();
+
+        Transacao transacaoDataForaDoPeriodoEscolhido = Transacao.builder()
+                .uuid(UUID.randomUUID())
+                .conta(Conta.builder()
+                        .uuid(UUID.randomUUID())
+                        .portador(Portador.builder().build())
+                        .bloqueada(false)
+                        .ativada(true)
+                        .saldo(BigDecimal.valueOf(10))
+                        .build())
+                .transacaoTipo(TransacaoTipo.DEPOSITO)
+                .dateTime(LocalDateTime.now().minusDays(10))
+                .totalDaTransacao(BigDecimal.valueOf(10.0))
+                .build();
+
+
+        var listOfTransacao = List.of(transacaoDataDentroDoPeriodoEscolhido, transacaoDataForaDoPeriodoEscolhido, transacaoDataDentroDoPeriodoEscolhido);
         when(contaRepository.findById(any())).thenReturn(Optional.of(TRANSACAO.getConta()));
         when(transacaoRepository.findByConta_Uuid(any())).thenReturn(listOfTransacao);
 
         var response = service.getTransactionsByDate(TRANSACAO.getConta().uuid, LocalDate.now(), LocalDate.now().plusDays(1));
 
         assertFalse(response.hasErrors());
-        assertEquals(listOfTransacao.get(0).uuid, response.getResultado().get(0).uuid);
-        assertEquals(listOfTransacao.get(0).transacaoTipo, response.getResultado().get(0).transacaoTipo);
-        assertEquals(listOfTransacao.get(0).totalDaTransacao, response.getResultado().get(0).totalDaTransacao);
-        assertEquals(listOfTransacao.get(0).dateTime, response.getResultado().get(0).dateTime);
-        assertEquals(listOfTransacao.get(0).saldo, response.getResultado().get(0).saldo);
+        assertTrue(response.getResultado().size() == 2);
+        assertEquals(transacaoDataDentroDoPeriodoEscolhido.uuid, response.getResultado().get(1).uuid);
+        assertEquals(transacaoDataDentroDoPeriodoEscolhido.transacaoTipo, response.getResultado().get(1).transacaoTipo);
+        assertEquals(transacaoDataDentroDoPeriodoEscolhido.totalDaTransacao, response.getResultado().get(1).totalDaTransacao);
+        assertEquals(transacaoDataDentroDoPeriodoEscolhido.dateTime, response.getResultado().get(1).dateTime);
+        assertEquals(transacaoDataDentroDoPeriodoEscolhido.saldo, response.getResultado().get(1).saldo);
     };
-//
-//    @Test
-//    void getTransactionsByDate_quandoReceberDatasInvalidas__deveriaRetornarNotificationComErro(){
-//    }
 }
