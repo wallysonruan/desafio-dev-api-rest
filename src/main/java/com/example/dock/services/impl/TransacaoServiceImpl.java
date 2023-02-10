@@ -32,7 +32,7 @@ public class TransacaoServiceImpl implements TransacaoService {
     }
     @Override
     public Notification<Transacao> novaTransacao(TransacaoComandoCriarDto transacaoComandoCriarDto) {
-        notification = new Notification<Transacao>();
+        notification.clearErrors();
 
         buscarConta(transacaoComandoCriarDto.contaUuid);
 
@@ -65,7 +65,7 @@ public class TransacaoServiceImpl implements TransacaoService {
 
     @Override
     public Notification<List<Transacao>> getTransactionsByDate(UUID contaUuid, LocalDate initialDate, LocalDate finalDate) {
-        notification = new Notification();
+        notification.clearErrors();
         buscarConta(contaUuid);
 
         if (notification.hasErrors()){

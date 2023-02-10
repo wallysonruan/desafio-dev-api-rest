@@ -19,7 +19,7 @@ public class AgenciaServiceImpl implements AgenciaService {
 
     @Override
     public Notification criarAgencia(Agencia agencia) {
-        notification = new Notification();
+        notification.clearErrors();
 
         if(repository.existsByNome(agencia.getNome())){
             notification.addError("Agencia já cadastrada.");
@@ -31,7 +31,7 @@ public class AgenciaServiceImpl implements AgenciaService {
 
     @Override
     public Notification deletarAgencia(Long id) {
-        notification = new Notification();
+        notification.clearErrors();
 
         if(repository.existsById(id)){
             repository.deleteById(id);

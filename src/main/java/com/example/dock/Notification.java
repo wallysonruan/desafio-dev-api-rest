@@ -19,6 +19,10 @@ public class Notification<T> {
         return ! errors.isEmpty();
     }
 
+    public void clearErrors(){
+        this.errors.clear();
+    }
+
     public String getErrors(){
         return errors.stream().collect(Collectors.joining(", "));
     }

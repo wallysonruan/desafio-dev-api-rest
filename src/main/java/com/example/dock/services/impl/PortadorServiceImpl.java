@@ -23,7 +23,7 @@ public class PortadorServiceImpl implements PortadorService {
 
     @Override
     public Notification criarPortador(PortadorComandoCriarDto portadorComandoCriarDto) {
-        notification = new Notification();
+        notification.clearErrors();
         portador = new Portador();
 
         if(repository.existsByCpf(portadorComandoCriarDto.cpf)){

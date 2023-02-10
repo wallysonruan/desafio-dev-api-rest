@@ -34,7 +34,7 @@ public class ContaServiceImpl implements ContaService {
 
     @Override
     public Notification criarConta(ContaComandoCriarDto contaComandoCriarDTO) {
-        notification = new Notification();
+        notification.clearErrors();
 
         verificaSePortadorExiste(contaComandoCriarDTO.portador);
         verificaSePortadorJaTemConta(contaComandoCriarDTO.portador);
