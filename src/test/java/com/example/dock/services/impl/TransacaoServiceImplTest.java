@@ -268,7 +268,6 @@ class TransacaoServiceImplTest {
         assertTrue(response.hasErrors());
         assertTrue(response.getErrors().contains("Saque não permitido, pois ultrapassaria o limite diário."));
     }
-
     @Test
     void getTransactionsByDate_deveriaRetornarNotificacaoComListaDeTransacoes(){
         Transacao transacaoDataDentroDoPeriodoEscolhido = Transacao.builder()

@@ -114,7 +114,6 @@ class TransacaoControllerTest {
         assertEquals(TRANSACAO_RESPOSTA_DTO.transacaoTipo, responseAsObject.transacaoTipo);
         assertEquals(TRANSACAO_RESPOSTA_DTO.conta, responseAsObject.conta);
     }
-
     @Test
     void novaTransacao__quandoReceberContaInexistente__deveriaRetornarHttps403ENotificationComErro() throws Exception {
         String mensagemDeErro = "Conta não encontrada.";
@@ -132,7 +131,6 @@ class TransacaoControllerTest {
         verify(service, times(1)).novaTransacao(any());
         assertTrue(response.getContentAsString().contains(mensagemDeErro));
     }
-
     @Test
     void novaTransacao__quandoReceberTransacaoComandoCriarDtoNull__deveriaRetornarErro404() throws Exception {
         TransacaoComandoCriarDto TRANSACAO_COMANDO_CRIAR_DTO_NULL = TransacaoComandoCriarDto.builder().build();
@@ -146,7 +144,6 @@ class TransacaoControllerTest {
 
         verify(service, times(0)).novaTransacao(any());
     }
-
     @Test
     void getTransacoesPorContaEPeriodo_quandoReceberContaCadastradaEDataDeInicioEFimValidas__deveriaRetornarTodasAsTransacoes() throws Exception{
         LocalDate initialDate = LocalDate.now();
