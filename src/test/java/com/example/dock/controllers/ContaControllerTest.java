@@ -23,11 +23,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -163,5 +161,37 @@ class ContaControllerTest {
         assertEquals(LISTA_DE_CONTAS.get(0).getAtivada(), responseAsListOfObjects.get(0).getAtivada());
         assertEquals(LISTA_DE_CONTAS.get(0).getPortador(), responseAsListOfObjects.get(0).getPortador());
         assertEquals(LISTA_DE_CONTAS.get(0).getSaldo(), responseAsListOfObjects.get(0).getSaldo());
+    }
+    @Test
+    void deleteConta_quandoReceberUuidValido__deveriaRetornar202() throws Exception {
+        when(service.deleteConta(CONTA.getUuid())).thenReturn(notification);
+
+        var response = mockMvc.perform(
+                delete(URL + "/" + CONTA.uuid)
+        ).andExpect(status().isAccepted()).andReturn().getResponse();
+
+        verify(service, times(1)).deleteConta(CONTA.uuid);
+    }
+
+    @Test
+    void deleteConta_quandoReceberUuidInvalido__deveriaRetornar403() throws Exception {
+        var response = mockMvc.perform(
+                delete(URL + "/a")
+        ).andExpect(status().isBadRequest()).andReturn().getResponse();
+
+        verify(service, times(0)).deleteConta(CONTA.uuid);
+    }
+
+    @Test
+    void deleteConta_quandoReceberUuidValidoDeContaNaoCadastrada__deveriaRetornar404EMensagemErro() throws Exception {
+        notification.addError("Conta não encontrada.");
+        when(service.deleteConta(CONTA.getUuid())).thenReturn(notification);
+
+        var response = mockMvc.perform(
+                delete(URL + "/" + CONTA.uuid)
+        ).andExpect(status().isBadRequest()).andReturn().getResponse();
+
+        verify(service, times(1)).deleteConta(CONTA.uuid);
+        assertTrue(response.getContentAsString().contains("Conta não encontrada."));
     }
 }

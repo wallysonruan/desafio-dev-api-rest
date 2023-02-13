@@ -47,7 +47,7 @@ public class ContaServiceImplTest {
             .build();
     private final Boolean ATIVADA = true;
     private final Boolean BLOQUEADA = false;
-    private final Conta CONTA = Conta.builder()
+    private final Conta CONTA_ATIVA = Conta.builder()
             .uuid(UUID_DEFAULT)
             .portador(PORTADOR)
             .agencia(AGENCIA)
@@ -55,9 +55,18 @@ public class ContaServiceImplTest {
             .ativada(ATIVADA)
             .bloqueada(BLOQUEADA)
             .build();
+
+    private final Conta CONTA_DESATIVADA = Conta.builder()
+            .uuid(UUID_DEFAULT)
+            .portador(PORTADOR)
+            .agencia(AGENCIA)
+            .saldo(SALDO)
+            .ativada(false)
+            .bloqueada(BLOQUEADA)
+            .build();
     private final ContaComandoCriarDto CONTA_COMANDO_CRIAR_DTO = ContaComandoCriarDto.builder()
-            .agencia(CONTA.getAgencia().getId())
-            .portador(CONTA.getPortador().getUuid())
+            .agencia(CONTA_ATIVA.getAgencia().getId())
+            .portador(CONTA_ATIVA.getPortador().getUuid())
             .build();
 
     private final ArrayList<Conta> LISTA_DE_CONTA = new ArrayList<>();
@@ -70,24 +79,24 @@ public class ContaServiceImplTest {
 
     @Test
     void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorValido__deveriaBuscarPortadorAdicionarAContaSalvarNoBancoDeDadosERetornarEla(){
-        when(agenciaRepository.existsById(CONTA.getAgencia().id)).thenReturn(true);
-        when(portadorRepository.existsById(CONTA.getPortador().getUuid())).thenReturn(true);
+        when(agenciaRepository.existsById(CONTA_ATIVA.getAgencia().id)).thenReturn(true);
+        when(portadorRepository.existsById(CONTA_ATIVA.getPortador().getUuid())).thenReturn(true);
 
-        when(portadorRepository.findById(any())).thenReturn(Optional.of(CONTA.getPortador()));
-        when(agenciaRepository.findById(any())).thenReturn(Optional.of(CONTA.getAgencia()));
-        when(contaRepository.save(any())).thenReturn(CONTA);
+        when(portadorRepository.findById(any())).thenReturn(Optional.of(CONTA_ATIVA.getPortador()));
+        when(agenciaRepository.findById(any())).thenReturn(Optional.of(CONTA_ATIVA.getAgencia()));
+        when(contaRepository.save(any())).thenReturn(CONTA_ATIVA);
 
         var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
 
         Assertions.assertFalse(retorno.hasErrors());
         Assertions.assertTrue(retorno.getErrors().isEmpty());
-        Assertions.assertEquals(CONTA, retorno.getResultado());
+        Assertions.assertEquals(CONTA_ATIVA, retorno.getResultado());
     }
 
     @Test
     void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorJaCadastrado__deveriaRetornarNotificationComErro(){
-        when(agenciaRepository.existsById(CONTA.getAgencia().id)).thenReturn(true);
-        when(contaRepository.existsByPortador_Uuid(CONTA.getPortador().getUuid())).thenReturn(true);
+        when(agenciaRepository.existsById(CONTA_ATIVA.getAgencia().id)).thenReturn(true);
+        when(contaRepository.existsByPortador_Uuid(CONTA_ATIVA.getPortador().getUuid())).thenReturn(true);
 
         var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
 
@@ -100,8 +109,8 @@ public class ContaServiceImplTest {
 
     @Test
     void criarConta_quandoReceberUmContaComandoCriarDtoComUuidPortadorNaoCadastrado__deveriaRetornarNotificationComErro(){
-        when(agenciaRepository.existsById(CONTA.getAgencia().id)).thenReturn(true);
-        when(portadorRepository.existsById(CONTA.getPortador().getUuid())).thenReturn(false);
+        when(agenciaRepository.existsById(CONTA_ATIVA.getAgencia().id)).thenReturn(true);
+        when(portadorRepository.existsById(CONTA_ATIVA.getPortador().getUuid())).thenReturn(false);
 
         var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
 
@@ -114,7 +123,7 @@ public class ContaServiceImplTest {
 
     @Test
     void criarConta_quandoReceberUmContaComandoCriarDtoComAgenciaNaoCadastrada__deveriaRetornarNotificationComErro(){
-        when(agenciaRepository.existsById(CONTA.getAgencia().getId())).thenReturn(false);
+        when(agenciaRepository.existsById(CONTA_ATIVA.getAgencia().getId())).thenReturn(false);
 
         var retorno = service.criarConta(CONTA_COMANDO_CRIAR_DTO);
 
@@ -127,9 +136,9 @@ public class ContaServiceImplTest {
 
     @Test
     void getAll__deveriaRetornarTodasAsContasRegistradas(){
-        LISTA_DE_CONTA.add(CONTA);
-        LISTA_DE_CONTA.add(CONTA);
-        LISTA_DE_CONTA.add(CONTA);
+        LISTA_DE_CONTA.add(CONTA_ATIVA);
+        LISTA_DE_CONTA.add(CONTA_ATIVA);
+        LISTA_DE_CONTA.add(CONTA_ATIVA);
         notification.setResultado(LISTA_DE_CONTA);
 
         when(contaRepository.findAll()).thenReturn(LISTA_DE_CONTA);
@@ -139,5 +148,44 @@ public class ContaServiceImplTest {
         verify(contaRepository, times(1)).findAll();
         Assertions.assertNotNull(retorno.getResultado());
         Assertions.assertEquals(retorno.getResultado(), LISTA_DE_CONTA);
+    }
+
+    @Test
+    void deleteConta_quandoReceberUuidValidoDeContaCadastradaAtiva__deveriaDeletar(){
+        when(contaRepository.findById(UUID_DEFAULT)).thenReturn(Optional.of(CONTA_ATIVA));
+        when(contaRepository.save(CONTA_ATIVA)).thenReturn(CONTA_ATIVA);
+
+        var retorno = service.deleteConta(UUID_DEFAULT);
+
+        verify(contaRepository, times(1)).findById(UUID_DEFAULT);
+        verify(contaRepository, times(1)).save(CONTA_ATIVA);
+        Assertions.assertFalse(retorno.hasErrors());
+        Assertions.assertNull(retorno.getResultado());
+    }
+
+    @Test
+    void deleteConta_quandoReceberUuidValidoDeContaCadastradaDesativada__deveriaRetornarErro(){
+        when(contaRepository.findById(UUID_DEFAULT)).thenReturn(Optional.of(CONTA_DESATIVADA));
+
+        var retorno = service.deleteConta(UUID_DEFAULT);
+
+        verify(contaRepository, times(1)).findById(UUID_DEFAULT);
+        verify(contaRepository, times(0)).save(CONTA_DESATIVADA);
+        Assertions.assertTrue(retorno.hasErrors());
+        Assertions.assertTrue(retorno.getErrors().contains("Conta desativada."));
+        Assertions.assertNull(retorno.getResultado());
+    }
+
+    @Test
+    void deleteConta_quandoReceberUuidValidoDeContaNaoCadastrada__deveriaRetornarErro(){
+        when(contaRepository.findById(UUID_DEFAULT)).thenReturn(Optional.empty());
+
+        var retorno = service.deleteConta(UUID_DEFAULT);
+
+        verify(contaRepository, times(1)).findById(UUID_DEFAULT);
+        verify(contaRepository, times(0)).save(CONTA_DESATIVADA);
+        Assertions.assertTrue(retorno.hasErrors());
+        Assertions.assertTrue(retorno.getErrors().contains("Conta não encontrada."));
+        Assertions.assertNull(retorno.getResultado());
     }
 }

@@ -11,6 +11,8 @@ import com.example.dock.repositories.PortadorRepository;
 import com.example.dock.services.ContaService;
 import org.springframework.stereotype.Service;
 
+import java.util.IllegalFormatCodePointException;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -61,6 +63,25 @@ public class ContaServiceImpl implements ContaService {
     @Override
     public Notification getAll() {
         notification.setResultado(contaRepository.findAll());
+        return notification;
+    }
+
+    @Override
+    public Notification deleteConta(UUID contaUuid) {
+        try{
+            this.conta = contaRepository.findById(contaUuid).get();
+            if(this.conta.ativada){
+                this.conta.setAtivada(false);
+                contaRepository.save(this.conta);
+            }else {
+                notification.clearErrors();
+                notification.addError("Conta desativada.");
+            }
+            return notification;
+        }catch (NoSuchElementException exception){
+            notification.clearErrors();
+            notification.addError("Conta não encontrada.");
+        }
         return notification;
     }
 
