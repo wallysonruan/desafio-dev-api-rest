@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("contas")
+@RequestMapping("api/v1/contas")
 @AllArgsConstructor
 public class ContaController {
 
@@ -35,7 +35,7 @@ public class ContaController {
         return new ResponseEntity<>(service.getAll().getResultado(), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<?> deleteConta(@PathVariable(value = "id") UUID contaUuid){
         Notification notification = service.deleteConta(contaUuid);
 

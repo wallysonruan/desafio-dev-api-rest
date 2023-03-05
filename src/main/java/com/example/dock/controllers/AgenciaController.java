@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/agencias")
+@RequestMapping("api/v1/agencias")
 @AllArgsConstructor
 public class AgenciaController {
 
@@ -29,7 +29,7 @@ public class AgenciaController {
         return new ResponseEntity(mapper.agenciaToAgenciaRespostaDto((Agencia) notification.getResultado()), HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "{id}")
     public ResponseEntity<?> deletarAgencia(@PathVariable Long id){
         var notification = service.deletarAgencia(id);
         if(notification.hasErrors()){

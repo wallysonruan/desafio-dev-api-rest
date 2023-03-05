@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/transacao")
+@RequestMapping("api/v1/transacoes")
 public class TransacaoController {
     private final TransacaoService service;
     private final TransacaoMapper transacaoMapper;
@@ -37,7 +37,7 @@ public class TransacaoController {
         return new ResponseEntity<>( transacaoMapper.transacaoToTransacaoDto(notification.getResultado()), HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/{uuid}")
+    @GetMapping(path = "{uuid}")
     public ResponseEntity<?> getTransactionsByPeriod(@PathVariable("uuid") UUID uuid, @RequestParam("initial-date") String initialDate, @RequestParam("final-date") String finalDate){
         Notification<List<Transacao>> notification = new Notification<>();
         LocalDate initialDateStringToLocalDate;

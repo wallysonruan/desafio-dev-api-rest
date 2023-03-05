@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/portadores")
+@RequestMapping("api/v1/portadores")
 @AllArgsConstructor
 public class PortadorController {
 
@@ -30,7 +30,7 @@ public class PortadorController {
         return new ResponseEntity<>(mapper.portadorToPortadorRespostaDto((Portador) notification.getResultado()), HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/{uuid}")
+    @DeleteMapping(path = "{uuid}")
     public ResponseEntity<?> deletarPortador(@PathVariable UUID uuid){
         var notification = service.deletarPortador(uuid);
 
